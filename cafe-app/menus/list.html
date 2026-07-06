@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>메뉴 | ☕ 카페</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="list.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">☕ 카페</a>
+        <nav class="nav">
+          <a href="list.html" class="nav-link active">메뉴</a>
+          <a href="../orders/list.html" class="nav-link">주문내역</a>
+          <a href="../my/index.html" class="nav-link">마이</a>
+          <a href="../basket/list.html" class="nav-link cart-link">
+            🛒 <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page">
+      <section class="page-head">
+        <h1>메뉴</h1>
+        <p class="text-muted">따뜻한 한 잔의 여유를 즐겨보세요</p>
+      </section>
+
+      <div class="category-tabs" id="category-tabs"></div>
+
+      <ul class="menu-grid" id="menu-grid"></ul>
+
+      <p class="empty" id="empty" hidden>해당 카테고리에 메뉴가 없습니다.</p>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="list.js"></script>
+  </body>
+</html>
