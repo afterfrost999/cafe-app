@@ -91,28 +91,75 @@ function getCartCount() {
   return getCart().reduce((sum, item) => sum + item.qty, 0);
 }
 
-/** 장바구니 총 금액 (data.js 의 MENUS 참조) */
+/** 장바구니 총 금액 */
 function getCartTotal() {
-  const menus = (window.CAFE_DATA && window.CAFE_DATA.MENUS) || [];
   return getCart().reduce((sum, item) => {
-    const menu = menus.find((m) => m.id === item.menuId);
+    const menu = getMenuById(item.menuId);
     return menu ? sum + menu.price * item.qty : sum;
   }, 0);
 }
 
-/* ── 데이터 조회 헬퍼 ── */
+/* ── 데이터 조회 헬퍼 (메뉴는 localStorage 에 오버레이하여 관리자 CRUD 반영) ── */
+
+const MENUS_KEY = "cafe_menus";
+
+/** 전체 메뉴 목록 (최초 호출 시 data.js 의 기본 데이터로 초기화) */
+function getAllMenus() {
+  let menus = storageGet(MENUS_KEY);
+  if (!menus) {
+    menus = ((window.CAFE_DATA && window.CAFE_DATA.MENUS) || []).map((m) => ({ ...m }));
+    storageSet(MENUS_KEY, menus);
+  }
+  return menus;
+}
+
+function saveAllMenus(menus) {
+  storageSet(MENUS_KEY, menus);
+}
 
 /** id 로 메뉴 찾기 */
 function getMenuById(id) {
-  const menus = (window.CAFE_DATA && window.CAFE_DATA.MENUS) || [];
-  return menus.find((m) => m.id === Number(id)) || null;
+  return getAllMenus().find((m) => m.id === Number(id)) || null;
 }
 
 /** 카테고리 id 로 메뉴 필터 ("all" 이면 전체) */
 function getMenusByCategory(categoryId) {
-  const menus = (window.CAFE_DATA && window.CAFE_DATA.MENUS) || [];
+  const menus = getAllMenus();
   if (!categoryId || categoryId === "all") return menus;
   return menus.filter((m) => m.categoryId === categoryId);
+}
+
+/** 메뉴 추가 (id 자동 부여) */
+function createMenu(data) {
+  const menus = getAllMenus();
+  const nextId = menus.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+  const menu = { soldOut: false, tags: [], ...data, id: nextId };
+  menus.push(menu);
+  saveAllMenus(menus);
+  return menu;
+}
+
+/** 메뉴 수정 */
+function updateMenu(id, changes) {
+  const menus = getAllMenus();
+  const idx = menus.findIndex((m) => m.id === Number(id));
+  if (idx === -1) return null;
+  menus[idx] = { ...menus[idx], ...changes, id: menus[idx].id };
+  saveAllMenus(menus);
+  return menus[idx];
+}
+
+/** 메뉴 삭제 */
+function deleteMenu(id) {
+  const menus = getAllMenus().filter((m) => m.id !== Number(id));
+  saveAllMenus(menus);
+}
+
+/** 품절 상태 토글 */
+function toggleMenuSoldOut(id) {
+  const menu = getMenuById(id);
+  if (!menu) return null;
+  return updateMenu(id, { soldOut: !menu.soldOut });
 }
 
 /* ── DOM / 기타 ── */
@@ -169,8 +216,13 @@ window.CAFE_UTILS = {
   clearCart,
   getCartCount,
   getCartTotal,
+  getAllMenus,
   getMenuById,
   getMenusByCategory,
+  createMenu,
+  updateMenu,
+  deleteMenu,
+  toggleMenuSoldOut,
   getQueryParam,
   qs,
   qsa,
