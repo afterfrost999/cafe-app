@@ -1,0 +1,178 @@
+/* ============================================
+   공통 유틸리티 (카트, 포맷, 스토리지 등)
+   전역 공유 자원 (window.CAFE_UTILS 로 노출)
+   ============================================ */
+
+/* ── 포맷 ── */
+
+/** 숫자를 원화 문자열로: 4000 → "4,000원" */
+function formatPrice(value) {
+  return `${Number(value).toLocaleString("ko-KR")}원`;
+}
+
+/** ISO 날짜를 "2026.07.06 09:12" 형태로 */
+function formatDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(
+    d.getHours()
+  )}:${pad(d.getMinutes())}`;
+}
+
+/* ── 로컬 스토리지 헬퍼 ── */
+
+function storageGet(key, fallback = null) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function storageSet(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* 저장 실패 무시 */
+  }
+}
+
+/* ── 장바구니 (Cart) ── */
+
+const CART_KEY = "cafe_cart";
+
+/** 장바구니 배열 반환: [{ menuId, qty }] */
+function getCart() {
+  return storageGet(CART_KEY, []);
+}
+
+/** 장바구니에 담기 (이미 있으면 수량 증가) */
+function addToCart(menuId, qty = 1) {
+  const cart = getCart();
+  const found = cart.find((item) => item.menuId === menuId);
+  if (found) {
+    found.qty += qty;
+  } else {
+    cart.push({ menuId, qty });
+  }
+  storageSet(CART_KEY, cart);
+  return cart;
+}
+
+/** 장바구니 항목 수량 변경 (0 이하이면 제거) */
+function updateCartQty(menuId, qty) {
+  let cart = getCart();
+  if (qty <= 0) {
+    cart = cart.filter((item) => item.menuId !== menuId);
+  } else {
+    const found = cart.find((item) => item.menuId === menuId);
+    if (found) found.qty = qty;
+  }
+  storageSet(CART_KEY, cart);
+  return cart;
+}
+
+/** 장바구니 항목 제거 */
+function removeFromCart(menuId) {
+  const cart = getCart().filter((item) => item.menuId !== menuId);
+  storageSet(CART_KEY, cart);
+  return cart;
+}
+
+/** 장바구니 비우기 */
+function clearCart() {
+  storageSet(CART_KEY, []);
+}
+
+/** 장바구니 총 수량 */
+function getCartCount() {
+  return getCart().reduce((sum, item) => sum + item.qty, 0);
+}
+
+/** 장바구니 총 금액 (data.js 의 MENUS 참조) */
+function getCartTotal() {
+  const menus = (window.CAFE_DATA && window.CAFE_DATA.MENUS) || [];
+  return getCart().reduce((sum, item) => {
+    const menu = menus.find((m) => m.id === item.menuId);
+    return menu ? sum + menu.price * item.qty : sum;
+  }, 0);
+}
+
+/* ── 데이터 조회 헬퍼 ── */
+
+/** id 로 메뉴 찾기 */
+function getMenuById(id) {
+  const menus = (window.CAFE_DATA && window.CAFE_DATA.MENUS) || [];
+  return menus.find((m) => m.id === Number(id)) || null;
+}
+
+/** 카테고리 id 로 메뉴 필터 ("all" 이면 전체) */
+function getMenusByCategory(categoryId) {
+  const menus = (window.CAFE_DATA && window.CAFE_DATA.MENUS) || [];
+  if (!categoryId || categoryId === "all") return menus;
+  return menus.filter((m) => m.categoryId === categoryId);
+}
+
+/* ── DOM / 기타 ── */
+
+/** URL 쿼리 파라미터 값 반환 */
+function getQueryParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+/** 짧은 querySelector 별칭 */
+function qs(selector, parent = document) {
+  return parent.querySelector(selector);
+}
+function qsa(selector, parent = document) {
+  return Array.from(parent.querySelectorAll(selector));
+}
+
+/** 간단한 토스트 메시지 */
+function showToast(message, duration = 2000) {
+  let toast = document.getElementById("cafe-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "cafe-toast";
+    toast.style.cssText = `
+      position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%) translateY(20px);
+      background: var(--color-primary, #6f4e37); color: #fff; padding: 12px 20px;
+      border-radius: 999px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+      opacity: 0; transition: opacity .25s, transform .25s; z-index: 9999; pointer-events: none;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateX(-50%) translateY(0)";
+  });
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(-50%) translateY(20px)";
+  }, duration);
+}
+
+/* 전역 노출 */
+window.CAFE_UTILS = {
+  formatPrice,
+  formatDate,
+  storageGet,
+  storageSet,
+  getCart,
+  addToCart,
+  updateCartQty,
+  removeFromCart,
+  clearCart,
+  getCartCount,
+  getCartTotal,
+  getMenuById,
+  getMenusByCategory,
+  getQueryParam,
+  qs,
+  qsa,
+  showToast,
+};
