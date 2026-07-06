@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>메뉴 관리 - 카페 관리자</title>
+  <link rel="stylesheet" href="../../css/variables.css" />
+  <link rel="stylesheet" href="list.css" />
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container admin-header__inner">
+      <h1 class="admin-header__title">☕ 관리자</h1>
+      <nav class="admin-header__nav">
+        <a href="../index.html" class="admin-header__link">대시보드</a>
+        <a href="list.html" class="admin-header__link is-active">메뉴 관리</a>
+        <a href="../orders/list.html" class="admin-header__link">주문 관리</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+    <div class="page-heading">
+      <h2 class="page-heading__title">메뉴 관리</h2>
+      <a href="create.html" class="btn btn-primary">+ 메뉴 추가</a>
+    </div>
+
+    <div class="filter-tabs" id="filterTabs"></div>
+
+    <div class="menu-table-wrap glass-card">
+      <table class="menu-table">
+        <thead>
+          <tr>
+            <th class="menu-table__img-col"></th>
+            <th>메뉴명</th>
+            <th>카테고리</th>
+            <th>가격</th>
+            <th>상태</th>
+            <th class="menu-table__actions-col">관리</th>
+          </tr>
+        </thead>
+        <tbody id="menuTableBody"></tbody>
+      </table>
+      <p class="menu-table__empty" id="emptyState" hidden>등록된 메뉴가 없습니다.</p>
+    </div>
+  </main>
+
+  <script src="../../js/data.js"></script>
+  <script src="../../js/utils.js"></script>
+  <script src="list.js"></script>
+</body>
+</html>
