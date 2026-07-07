@@ -141,9 +141,9 @@ cafe-app/
 - [x] `orders/list.html` — 주문 내역 목록
 - [x] `orders/list.css`
 - [x] `orders/list.js`
-- [ ] `orders/detail.html` — 주문 상세
-- [ ] `orders/detail.css`
-- [ ] `orders/detail.js`
+- [x] `orders/detail.html` — 주문 상세
+- [x] `orders/detail.css`
+- [x] `orders/detail.js`
 
 ### 6단계: 고객 - 메인 페이지
 

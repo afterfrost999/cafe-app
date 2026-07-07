@@ -1,0 +1,226 @@
+/* ============================================
+   고객 - 주문 상세
+   ============================================ */
+
+/* 헤더 (공통 패턴) */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-inner {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.nav-link {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--color-primary);
+}
+
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cart-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* 페이지 */
+.page {
+  padding-block: var(--space-lg) var(--space-xl);
+  max-width: 720px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-lg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.back-link:hover {
+  color: var(--color-primary);
+}
+
+/* 주문 요약 헤더 */
+.order-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.order-id {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  margin-bottom: 4px;
+}
+
+.order-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.order-status {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 주문 항목 */
+.section-title {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.item-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: var(--space-lg);
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+}
+
+.order-item + .order-item {
+  border-top: 1px solid var(--color-divider);
+}
+
+.item-name {
+  font-weight: 700;
+}
+
+.item-unit {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.item-qty {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.item-subtotal {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  min-width: 80px;
+  text-align: right;
+}
+
+/* 결제 요약 */
+.pay-box {
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.pay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-muted);
+}
+
+.pay-row dd {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.pay-divider {
+  height: 1px;
+  background: var(--color-divider);
+  margin: var(--space-md) 0;
+}
+
+.pay-final dt {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pay-final dd {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-primary-dark);
+}
+
+/* not-found */
+.not-found {
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--color-text-muted);
+}
+
+.not-found .back-link {
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 480px) {
+  .order-item {
+    grid-template-columns: 1fr auto;
+  }
+  .item-qty {
+    display: none;
+  }
+}
