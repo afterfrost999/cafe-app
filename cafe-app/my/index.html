@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>마이페이지 | ☕ 카페</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">☕ 카페</a>
+        <nav class="nav">
+          <a href="../menus/list.html" class="nav-link">메뉴</a>
+          <a href="../orders/list.html" class="nav-link">주문내역</a>
+          <a href="index.html" class="nav-link active">마이</a>
+          <a href="../basket/list.html" class="nav-link cart-link">
+            🛒 <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page">
+      <!-- 프로필 -->
+      <section class="profile glass-card">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-info">
+          <h1 class="profile-name">게스트님</h1>
+          <p class="text-muted">오늘도 따뜻한 하루 보내세요 ☕</p>
+        </div>
+      </section>
+
+      <!-- 주문 통계 -->
+      <section class="stats" id="stats">
+        <div class="stat-tile">
+          <span class="stat-label">총 주문</span>
+          <span class="stat-value" id="stat-count">0건</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">누적 결제</span>
+          <span class="stat-value" id="stat-total">0원</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">진행 중</span>
+          <span class="stat-value" id="stat-progress">0건</span>
+        </div>
+      </section>
+
+      <!-- 최근 주문 -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">최근 주문</h2>
+          <a href="../orders/list.html" class="section-more">전체 보기 →</a>
+        </div>
+        <ul class="recent-list" id="recent-list"></ul>
+        <p class="empty" id="recent-empty" hidden>아직 주문 내역이 없어요.</p>
+      </section>
+
+      <!-- 바로가기 -->
+      <section class="section">
+        <h2 class="section-title">바로가기</h2>
+        <ul class="shortcut-list">
+          <li>
+            <a href="../orders/list.html" class="shortcut">
+              <span>🧾 주문 내역</span><span class="shortcut-arrow">›</span>
+            </a>
+          </li>
+          <li>
+            <a href="../basket/list.html" class="shortcut">
+              <span>🛒 장바구니</span><span class="shortcut-arrow">›</span>
+            </a>
+          </li>
+          <li>
+            <a href="../menus/list.html" class="shortcut">
+              <span>☕ 메뉴 보기</span><span class="shortcut-arrow">›</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
