@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>☕ 카페 | 따뜻한 한 잔의 여유</title>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="logo">☕ 카페</a>
+        <nav class="nav">
+          <a href="menus/list.html" class="nav-link">메뉴</a>
+          <a href="orders/list.html" class="nav-link">주문내역</a>
+          <a href="my/index.html" class="nav-link">마이</a>
+          <a href="basket/list.html" class="nav-link cart-link">
+            🛒 <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- 히어로 -->
+      <section class="hero">
+        <div class="container hero-inner">
+          <p class="hero-eyebrow">EVERYDAY COFFEE</p>
+          <h1 class="hero-title">따뜻한 한 잔의<br />여유를 즐겨보세요</h1>
+          <p class="hero-desc">
+            정성껏 내린 커피와 달콤한 디저트,<br />
+            오늘의 기분에 어울리는 메뉴를 만나보세요.
+          </p>
+          <a href="menus/list.html" class="btn btn-primary hero-cta">
+            메뉴 보러 가기 →
+          </a>
+        </div>
+      </section>
+
+      <!-- 카테고리 바로가기 -->
+      <section class="container section">
+        <h2 class="section-title">카테고리</h2>
+        <ul class="category-grid" id="category-grid"></ul>
+      </section>
+
+      <!-- 추천 메뉴 -->
+      <section class="container section">
+        <div class="section-head">
+          <h2 class="section-title">추천 메뉴</h2>
+          <a href="menus/list.html" class="section-more">전체 보기 →</a>
+        </div>
+        <ul class="menu-grid" id="featured-grid"></ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>☕ 카페 · 매일 07:00 - 22:00</p>
+        <p class="text-muted">© 2026 Cafe App. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
