@@ -63,24 +63,26 @@
           ? `<div class="soldout-overlay">품절</div>`
           : "";
         return `
-          <li class="menu-card">
-            <a href="detail.html?id=${m.id}">
-              <div class="menu-thumb">
-                <img src="${m.image}" alt="${m.name}" loading="lazy" />
-                <div class="menu-tags">${tags}</div>
-                ${soldOut}
-              </div>
-              <div class="menu-body">
-                <h3 class="menu-name">${m.name}</h3>
-                <p class="menu-desc">${m.description}</p>
-              </div>
-            </a>
-            <div class="menu-body" style="padding-top:0">
-              <div class="menu-foot">
-                <span class="menu-price">${formatPrice(m.price)}</span>
-                <button class="add-btn" data-id="${m.id}" ${
+          <li class="floaty">
+            <div class="menu-card">
+              <a href="detail.html?id=${m.id}">
+                <div class="menu-thumb">
+                  <img src="${m.image}" alt="${m.name}" loading="lazy" />
+                  <div class="menu-tags">${tags}</div>
+                  ${soldOut}
+                </div>
+                <div class="menu-body">
+                  <h3 class="menu-name">${m.name}</h3>
+                  <p class="menu-desc">${m.description}</p>
+                </div>
+              </a>
+              <div class="menu-body" style="padding-top:0">
+                <div class="menu-foot">
+                  <span class="menu-price">${formatPrice(m.price)}</span>
+                  <button class="add-btn" data-id="${m.id}" ${
           m.soldOut ? "disabled" : ""
         } aria-label="${m.name} 담기">+</button>
+                </div>
               </div>
             </div>
           </li>`;
