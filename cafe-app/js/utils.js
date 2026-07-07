@@ -163,6 +163,16 @@ function createOrderFromCart() {
   return order;
 }
 
+/** 주문 상태 변경 후 저장 (반환: 갱신된 주문 또는 null) */
+function updateOrderStatus(id, status) {
+  const orders = getOrders();
+  const idx = orders.findIndex((o) => o.id === id);
+  if (idx === -1) return null;
+  orders[idx] = { ...orders[idx], status };
+  storageSet(ORDERS_KEY, orders);
+  return orders[idx];
+}
+
 /* ── 데이터 조회 헬퍼 (메뉴는 localStorage 에 오버레이하여 관리자 CRUD 반영) ── */
 
 const MENUS_KEY = "cafe_menus";
@@ -283,6 +293,7 @@ window.CAFE_UTILS = {
   getOrders,
   getOrderById,
   createOrderFromCart,
+  updateOrderStatus,
   getAllMenus,
   getMenuById,
   getMenusByCategory,

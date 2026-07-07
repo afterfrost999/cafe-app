@@ -165,6 +165,6 @@ cafe-app/
 - [x] `admin/orders/list.html` — 주문 목록
 - [x] `admin/orders/list.css`
 - [x] `admin/orders/list.js`
-- [ ] `admin/orders/detail.html` — 주문 상세
-- [ ] `admin/orders/detail.css`
-- [ ] `admin/orders/detail.js`
+- [x] `admin/orders/detail.html` — 주문 상세
+- [x] `admin/orders/detail.css`
+- [x] `admin/orders/detail.js`
