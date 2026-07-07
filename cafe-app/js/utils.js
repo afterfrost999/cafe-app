@@ -99,6 +99,70 @@ function getCartTotal() {
   }, 0);
 }
 
+/* ── 주문 (Order) ── */
+
+const ORDERS_KEY = "cafe_orders";
+
+/** 전체 주문 목록 (없으면 data.js 의 SAMPLE_ORDERS 로 초기화) */
+function getOrders() {
+  let orders = storageGet(ORDERS_KEY);
+  if (!orders) {
+    orders = ((window.CAFE_DATA && window.CAFE_DATA.SAMPLE_ORDERS) || []).map(
+      (o) => ({ ...o })
+    );
+    storageSet(ORDERS_KEY, orders);
+  }
+  return orders;
+}
+
+/** id 로 주문 찾기 */
+function getOrderById(id) {
+  return getOrders().find((o) => o.id === id) || null;
+}
+
+/** 주문번호 생성: ORD-YYYYMMDD-NNN */
+function generateOrderId(orders) {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const ymd = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
+    now.getDate()
+  )}`;
+  const todayCount = orders.filter((o) => o.id.includes(`-${ymd}-`)).length;
+  return `ORD-${ymd}-${String(todayCount + 1).padStart(3, "0")}`;
+}
+
+/**
+ * 현재 장바구니로 주문 생성 후 장바구니 비우기.
+ * 반환: 생성된 주문 객체 (장바구니가 비었으면 null)
+ */
+function createOrderFromCart() {
+  const cart = getCart();
+  if (cart.length === 0) return null;
+
+  const items = cart
+    .map((c) => {
+      const menu = getMenuById(c.menuId);
+      if (!menu) return null;
+      return { menuId: menu.id, name: menu.name, price: menu.price, qty: c.qty };
+    })
+    .filter(Boolean);
+  if (items.length === 0) return null;
+
+  const orders = getOrders();
+  const order = {
+    id: generateOrderId(orders),
+    createdAt: new Date().toISOString(),
+    status: "pending",
+    items,
+    total: items.reduce((sum, it) => sum + it.price * it.qty, 0),
+  };
+
+  orders.unshift(order);
+  storageSet(ORDERS_KEY, orders);
+  clearCart();
+  return order;
+}
+
 /* ── 데이터 조회 헬퍼 (메뉴는 localStorage 에 오버레이하여 관리자 CRUD 반영) ── */
 
 const MENUS_KEY = "cafe_menus";
@@ -216,6 +280,9 @@ window.CAFE_UTILS = {
   clearCart,
   getCartCount,
   getCartTotal,
+  getOrders,
+  getOrderById,
+  createOrderFromCart,
   getAllMenus,
   getMenuById,
   getMenusByCategory,
