@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대시보드 | 🔴 관리자</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="container header-inner">
+        <a href="index.html" class="logo">🔴 관리자</a>
+        <nav class="nav">
+          <a href="index.html" class="nav-link active">대시보드</a>
+          <a href="menus/list.html" class="nav-link">메뉴 관리</a>
+          <a href="orders/list.html" class="nav-link">주문 관리</a>
+          <a href="../index.html" class="nav-link nav-exit">고객 화면 →</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page">
+      <section class="page-head">
+        <h1>대시보드</h1>
+        <p class="text-muted">오늘의 운영 현황을 한눈에 확인하세요</p>
+      </section>
+
+      <!-- KPI 통계 -->
+      <section class="stats">
+        <div class="stat-tile">
+          <span class="stat-label">총 주문</span>
+          <span class="stat-value" id="stat-orders">0건</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">총 매출</span>
+          <span class="stat-value" id="stat-revenue">0원</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">진행 중 주문</span>
+          <span class="stat-value" id="stat-progress">0건</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">등록 메뉴</span>
+          <span class="stat-value" id="stat-menus">0개</span>
+        </div>
+      </section>
+
+      <!-- 빠른 작업 -->
+      <section class="section">
+        <h2 class="section-title">빠른 작업</h2>
+        <ul class="quick-list">
+          <li>
+            <a href="menus/create.html" class="quick-card">
+              <span class="quick-emoji">➕</span>
+              <span class="quick-name">메뉴 추가</span>
+            </a>
+          </li>
+          <li>
+            <a href="menus/list.html" class="quick-card">
+              <span class="quick-emoji">📋</span>
+              <span class="quick-name">메뉴 관리</span>
+            </a>
+          </li>
+          <li>
+            <a href="orders/list.html" class="quick-card">
+              <span class="quick-emoji">🧾</span>
+              <span class="quick-name">주문 관리</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- 최근 주문 -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">최근 주문</h2>
+          <a href="orders/list.html" class="section-more">전체 보기 →</a>
+        </div>
+        <div class="table-wrap">
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th>주문번호</th>
+                <th>주문일시</th>
+                <th>메뉴</th>
+                <th class="ta-right">금액</th>
+                <th class="ta-center">상태</th>
+              </tr>
+            </thead>
+            <tbody id="recent-body"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="recent-empty" hidden>아직 주문이 없어요.</p>
+      </section>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

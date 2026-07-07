@@ -159,9 +159,9 @@ cafe-app/
 
 ### 8단계: 관리자 - 대시보드 & 주문 관리
 
-- [ ] `admin/index.html` — 대시보드
-- [ ] `admin/index.css`
-- [ ] `admin/index.js`
+- [x] `admin/index.html` — 대시보드
+- [x] `admin/index.css`
+- [x] `admin/index.js`
 - [ ] `admin/orders/list.html` — 주문 목록
 - [ ] `admin/orders/list.css`
 - [ ] `admin/orders/list.js`
