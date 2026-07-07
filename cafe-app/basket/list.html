@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>장바구니 | ☕ 카페</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="list.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">☕ 카페</a>
+        <nav class="nav">
+          <a href="../menus/list.html" class="nav-link">메뉴</a>
+          <a href="../orders/list.html" class="nav-link">주문내역</a>
+          <a href="../my/index.html" class="nav-link">마이</a>
+          <a href="list.html" class="nav-link cart-link active">
+            🛒 <span id="cart-count" class="cart-count">0</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page">
+      <section class="page-head">
+        <h1>장바구니</h1>
+        <p class="text-muted">담은 메뉴를 확인하고 주문하세요</p>
+      </section>
+
+      <div class="basket-layout">
+        <!-- 장바구니 항목 -->
+        <ul class="cart-list" id="cart-list"></ul>
+
+        <!-- 결제 요약 -->
+        <aside class="summary glass-card" id="summary">
+          <h2 class="summary-title">주문 요약</h2>
+          <dl class="summary-row">
+            <dt>총 수량</dt>
+            <dd id="summary-count">0개</dd>
+          </dl>
+          <dl class="summary-row">
+            <dt>총 상품금액</dt>
+            <dd id="summary-total">0원</dd>
+          </dl>
+          <div class="summary-divider"></div>
+          <dl class="summary-row summary-final">
+            <dt>결제 예정금액</dt>
+            <dd id="summary-final">0원</dd>
+          </dl>
+          <button class="btn btn-primary summary-order" id="btn-order">
+            주문하기
+          </button>
+          <button class="btn btn-outline summary-clear" id="btn-clear">
+            장바구니 비우기
+          </button>
+        </aside>
+      </div>
+
+      <!-- 빈 장바구니 -->
+      <div class="empty" id="empty" hidden>
+        <p class="empty-emoji">🛒</p>
+        <p>장바구니가 비어 있어요.</p>
+        <a href="../menus/list.html" class="btn btn-primary">메뉴 보러 가기</a>
+      </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="list.js"></script>
+  </body>
+</html>
