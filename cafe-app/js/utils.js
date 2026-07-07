@@ -176,13 +176,18 @@ function updateOrderStatus(id, status) {
 /* ── 데이터 조회 헬퍼 (메뉴는 localStorage 에 오버레이하여 관리자 CRUD 반영) ── */
 
 const MENUS_KEY = "cafe_menus";
+const MENUS_VER_KEY = "cafe_menus_ver";
+// data.js 의 기본 메뉴를 바꾸면 이 숫자를 올려 저장된 캐시를 새로 시딩한다.
+const MENUS_VERSION = 3;
 
-/** 전체 메뉴 목록 (최초 호출 시 data.js 의 기본 데이터로 초기화) */
+/** 전체 메뉴 목록 (최초 호출 또는 버전 변경 시 data.js 기본 데이터로 초기화) */
 function getAllMenus() {
   let menus = storageGet(MENUS_KEY);
-  if (!menus) {
+  const ver = storageGet(MENUS_VER_KEY);
+  if (!menus || ver !== MENUS_VERSION) {
     menus = ((window.CAFE_DATA && window.CAFE_DATA.MENUS) || []).map((m) => ({ ...m }));
     storageSet(MENUS_KEY, menus);
+    storageSet(MENUS_VER_KEY, MENUS_VERSION);
   }
   return menus;
 }

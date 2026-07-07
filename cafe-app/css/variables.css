@@ -1,50 +1,58 @@
 /* ============================================
    전역 CSS 변수 & 리셋
-   테마: 라이트 + 따뜻한 브라운/크림 톤
+   테마: 플로팅 다크 — 웜 그래파이트 캔버스 + 둥둥 뜬 카드 + 탠저린
    ============================================ */
 
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap");
+
 :root {
-  /* ── 브랜드 컬러 (브라운/크림) ── */
-  --color-primary: #6f4e37;        /* 커피 브라운 */
-  --color-primary-dark: #4e3524;
-  --color-primary-light: #a1866f;
-  --color-accent: #c8956d;         /* 카라멜 */
-  --color-accent-light: #e0b892;
+  /* ── 브랜드 컬러 (웜 카라멜 — 브라운과 조화) ── */
+  --color-primary: #d68f4e;        /* 포인트 컬러 (버튼·로고·강조) */
+  --color-primary-dark: #f7efe4;   /* 라이트 크림 (제목·가격) */
+  --color-primary-light: #e8b57e;
+  --color-accent: #d68f4e;         /* 배지·카운트 */
+  --color-accent-light: #f0cfa4;
 
   /* ── 배경 / 표면 ── */
-  --color-bg: #f7f1e8;             /* 크림 배경 */
-  --color-surface: #fffaf3;        /* 카드 표면 */
-  --color-surface-2: #f0e6d8;
+  --color-bg: #2a2019;             /* 웜 브라운 캔버스 (살짝 밝은 갈색) */
+  --color-panel: #34281d;          /* 하단 패널 (캔버스보다 살짝 밝게) */
+  --color-surface: #453626;        /* 떠 있는 카드 (패널보다 밝게) */
+  --color-surface-2: #52402d;      /* 서브 표면 */
 
   /* ── 텍스트 ── */
-  --color-text: #3a2e26;
-  --color-text-muted: #8a7a6d;
-  --color-text-invert: #fffaf3;
+  --color-text: #f3ece2;           /* 웜 크림 */
+  --color-text-muted: #a99c8d;     /* 라떼 그레이 */
+  --color-text-invert: #17130f;    /* 탠저린 버튼 위 어두운 텍스트 */
 
   /* ── 상태 ── */
-  --color-success: #6b8e5a;
-  --color-warning: #d9a441;
-  --color-danger: #c0563f;
-  --color-info: #6d8ba1;
+  --color-success: #86bd6a;
+  --color-warning: #e6bd57;
+  --color-danger: #e5795f;
+  --color-info: #82abcf;
 
-  /* ── 경계선 / 구분선 ── */
-  --color-border: #e3d5c3;
-  --color-divider: #ede2d3;
+  /* ── 경계선 / 구분선 (라이트 헤어라인) ── */
+  --color-border: rgba(243, 236, 226, 0.1);
+  --color-divider: rgba(243, 236, 226, 0.07);
 
-  /* ── Glass morphism ── */
-  --glass-bg: rgba(255, 250, 243, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-blur: 12px;
+  /* ── 관리자 바 (더 딥한 대비) ── */
+  --color-admin-bar: #100d0a;
+  --color-admin-bar-text: #f3ece2;
 
-  /* ── 그림자 ── */
-  --shadow-sm: 0 1px 3px rgba(58, 46, 38, 0.08);
-  --shadow-md: 0 4px 12px rgba(58, 46, 38, 0.12);
-  --shadow-lg: 0 10px 30px rgba(58, 46, 38, 0.16);
+  /* ── Glass morphism (다크 프로스트 — 헤더용) ── */
+  --glass-bg: rgba(27, 23, 20, 0.62);
+  --glass-border: rgba(243, 236, 226, 0.08);
+  --glass-blur: 18px;
 
-  /* ── 반경 ── */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
+  /* ── 그림자 (부유감 — 깊은 앰비언트) ── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 40px 80px rgba(0, 0, 0, 0.55);
+  --glow-accent: 0 12px 30px rgba(214, 143, 78, 0.35);
+
+  /* ── 반경 (큼직하게) ── */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
   --radius-full: 999px;
 
   /* ── 간격 ── */
@@ -52,23 +60,24 @@
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
-  --space-xl: 40px;
+  --space-xl: 48px;
 
   /* ── 타이포그래피 ── */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR",
-    "Malgun Gothic", sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-display: "Space Grotesk", "Inter", "Noto Sans KR", sans-serif;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;
-  --font-size-xl: 1.75rem;
-  --font-size-2xl: 2.5rem;
+  --font-size-xl: 1.9rem;
+  --font-size-2xl: 3rem;
 
   /* ── 레이아웃 ── */
-  --container-max: 1120px;
-  --header-height: 64px;
+  --container-max: 1160px;
+  --header-height: 68px;
 
   /* ── 트랜지션 ── */
-  --transition: 0.2s ease;
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================
@@ -93,7 +102,19 @@ body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--color-text);
-  background: var(--color-bg);
+  background:
+    radial-gradient(
+      820px 420px at 85% -8%,
+      rgba(255, 106, 51, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px 420px at 5% 110%,
+      rgba(120, 90, 200, 0.08),
+      transparent 60%
+    ),
+    var(--color-bg);
+  background-attachment: fixed;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -135,12 +156,19 @@ h1,
 h2,
 h3,
 h4 {
-  line-height: 1.3;
+  font-family: var(--font-display);
+  line-height: 1.1;
   font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
@@ -171,29 +199,34 @@ h4 {
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
   border-radius: var(--radius-full);
-  font-weight: 600;
-  transition: background var(--transition), transform var(--transition),
-    box-shadow var(--transition);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: transform var(--transition), box-shadow var(--transition),
+    background var(--transition), color var(--transition),
+    border-color var(--transition);
 }
 
 .btn-primary {
   background: var(--color-primary);
   color: var(--color-text-invert);
+  box-shadow: var(--glow-accent);
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(214, 143, 78, 0.45);
 }
 
 .btn-outline {
   background: transparent;
-  border: 1.5px solid var(--color-primary);
-  color: var(--color-primary);
+  border: 1.5px solid var(--color-text);
+  color: var(--color-text);
 }
 
 .btn-outline:hover {
-  background: var(--color-primary);
+  background: var(--color-text);
   color: var(--color-text-invert);
+  transform: translateY(-2px);
 }
 
 .btn:active {
@@ -202,16 +235,29 @@ h4 {
 
 .badge {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 2px 12px;
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 700;
   background: var(--color-surface-2);
-  color: var(--color-text-muted);
+  color: var(--color-text);
 }
 
 .text-muted {
   color: var(--color-text-muted);
+}
+
+/* 로고 + 마스코트 GIF */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-gif {
+  height: 30px;
+  width: auto;
+  border-radius: 6px;
 }
 
 .sr-only {
@@ -224,4 +270,48 @@ h4 {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ============================================
+   플로팅 카드 — 배경 위에 둥둥 떠 있는 효과
+   ============================================ */
+
+@keyframes float-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.floaty {
+  animation: float-bob 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* 카드마다 다른 리듬으로 떠오르도록 스태거 */
+.floaty:nth-child(4n + 1) {
+  animation-duration: 6.5s;
+  animation-delay: 0s;
+}
+.floaty:nth-child(4n + 2) {
+  animation-duration: 5.5s;
+  animation-delay: -1.2s;
+}
+.floaty:nth-child(4n + 3) {
+  animation-duration: 7s;
+  animation-delay: -0.6s;
+}
+.floaty:nth-child(4n + 4) {
+  animation-duration: 6s;
+  animation-delay: -1.8s;
+}
+
+/* 접근성: 모션 최소화 선호 시 정지 */
+@media (prefers-reduced-motion: reduce) {
+  .floaty {
+    animation: none;
+  }
 }
