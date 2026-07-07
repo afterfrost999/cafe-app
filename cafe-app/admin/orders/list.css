@@ -1,0 +1,206 @@
+/* ============================================
+   관리자 - 주문 목록
+   ============================================ */
+
+/* 관리자 헤더 (대시보드와 동일 톤) */
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-primary-dark);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.header-inner {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-text-invert);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.nav-link {
+  font-weight: 600;
+  color: rgba(255, 250, 243, 0.65);
+  transition: color var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--color-text-invert);
+}
+
+.nav-exit {
+  font-size: var(--font-size-sm);
+  color: var(--color-accent-light);
+}
+
+/* 페이지 */
+.page {
+  padding-block: var(--space-xl);
+}
+
+.page-head {
+  margin-bottom: var(--space-lg);
+}
+
+.page-head h1 {
+  font-size: var(--font-size-2xl);
+  color: var(--color-primary-dark);
+}
+
+/* 상태 필터 탭 */
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.filter-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  transition: all var(--transition);
+}
+
+.filter-tab:hover {
+  border-color: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.filter-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-invert);
+}
+
+.filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.filter-tab.active .filter-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* 주문 테이블 */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.order-table th,
+.order-table td {
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.order-table thead th {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.order-table tbody tr {
+  border-bottom: 1px solid var(--color-divider);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.order-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.order-table tbody tr:hover {
+  background: var(--color-surface-2);
+}
+
+.order-id {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.order-menu {
+  color: var(--color-text-muted);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ta-right {
+  text-align: right !important;
+}
+
+.ta-center {
+  text-align: center !important;
+}
+
+.order-amount {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 빈 상태 */
+.empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 600px) {
+  .page-head h1 {
+    font-size: var(--font-size-xl);
+  }
+  .nav {
+    gap: var(--space-sm);
+  }
+}

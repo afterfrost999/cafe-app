@@ -162,9 +162,9 @@ cafe-app/
 - [x] `admin/index.html` — 대시보드
 - [x] `admin/index.css`
 - [x] `admin/index.js`
-- [ ] `admin/orders/list.html` — 주문 목록
-- [ ] `admin/orders/list.css`
-- [ ] `admin/orders/list.js`
+- [x] `admin/orders/list.html` — 주문 목록
+- [x] `admin/orders/list.css`
+- [x] `admin/orders/list.js`
 - [ ] `admin/orders/detail.html` — 주문 상세
 - [ ] `admin/orders/detail.css`
 - [ ] `admin/orders/detail.js`
