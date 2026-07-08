@@ -1,0 +1,17 @@
+{
+  "name": "cafe-app",
+  "version": "1.0.0",
+  "description": "새로 만든 cafe-app (다윗) 수정",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve -l 3120",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "serve": "^14.2.6"
+  }
+}
