@@ -13,6 +13,11 @@
   --color-accent: #d68f4e;         /* 배지·카운트 */
   --color-accent-light: #f0cfa4;
 
+  /* ── 두루마리/카드 공통 골드 (슬라이더 톤: 살짝 어두운 양피지) ── */
+  --scroll-gold-bg: linear-gradient(rgba(35, 22, 8, 0.3), rgba(35, 22, 8, 0.38)),
+    #cf9a3e var(--paper-tex, none);
+  --scroll-gold-border: #8a5f22;
+
   /* ── 배경 / 표면 ── */
   --color-bg: #2a2019;             /* 웜 브라운 캔버스 (살짝 밝은 갈색) */
   --color-panel: #34281d;          /* 하단 패널 (캔버스보다 살짝 밝게) */

@@ -67,7 +67,7 @@
             <div class="menu-card">
               <a href="detail.html?id=${m.id}">
                 <div class="menu-thumb">
-                  <img src="${m.image}" alt="${m.name}" loading="lazy" />
+                  <img src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(m) : m.image}" alt="${m.name}" loading="lazy" />
                   <div class="menu-tags">${tags}</div>
                   ${soldOut}
                 </div>
@@ -99,6 +99,15 @@
         showToast("장바구니에 담았어요 🛒");
       });
     });
+  }
+
+  /* 메뉴 리스트 배경을 불규칙 나무 바닥 질감으로 */
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${CAFE_PIXEL.paperTexture()})`
+    );
+    CAFE_PIXEL.applyFloor(document.body, null, false);
   }
 
   /* 초기화 */

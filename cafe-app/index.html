@@ -34,6 +34,26 @@
           <!-- 은은하게 맥동하는 불빛 -->
           <div class="fire-glow"></div>
         </div>
+
+        <!-- 좌측 세로 바로가기 -->
+        <nav class="hero-nav" aria-label="바로가기">
+          <a class="hero-nav-item" href="menus/list.html"><span>메뉴</span></a>
+          <a class="hero-nav-item" href="#" data-soon="이벤트"><span>이벤트</span></a>
+          <a class="hero-nav-item" href="#" data-soon="랜덤 메뉴 추천"><span>랜덤 메뉴 추천</span></a>
+          <a class="hero-nav-item" href="basket/list.html"><span>장바구니</span></a>
+          <a class="hero-nav-item" href="orders/list.html"><span>주문내역</span></a>
+          <a class="hero-nav-item" href="my/index.html"><span>마이페이지</span></a>
+        </nav>
+
+        <!-- 우측 세로 슬라이더 (빈 메뉴카드 4장 순환) -->
+        <div class="hero-side" aria-hidden="true">
+          <div class="hero-side-slider" id="hero-side-slider">
+            <div class="side-card"></div>
+            <div class="side-card"></div>
+            <div class="side-card"></div>
+            <div class="side-card"></div>
+          </div>
+        </div>
       </section>
 
       <!-- 하단 패널 (다른 페이지처럼 밝은 배경) -->
@@ -64,6 +84,7 @@
 
     <script src="js/data.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/pixelart.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

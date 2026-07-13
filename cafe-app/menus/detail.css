@@ -96,8 +96,9 @@
 
 .detail-media img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
+  image-rendering: pixelated; /* 픽셀아트 장난감 그림 */
 }
 
 .detail-soldout {

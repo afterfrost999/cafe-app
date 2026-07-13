@@ -256,3 +256,76 @@
     font-size: var(--font-size-xl);
   }
 }
+
+/* ============================================
+   픽셀아트 메뉴 그림 + 두루마리 카드
+   ============================================ */
+.menu-thumb img {
+  image-rendering: pixelated;
+}
+
+.category-card,
+.menu-card {
+  position: relative;
+  border-radius: 3px; /* 각진 모서리 */
+  background: var(--scroll-gold-bg); /* 슬라이더와 같은 골드 톤 */
+  background-size: auto, 84px 84px;
+  border: 1px solid var(--scroll-gold-border);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+  color: #3a2410;
+  overflow: visible;
+  margin-block: 8px; /* 봉이 이웃 카드와 겹치지 않게 */
+}
+
+/* 호버 시 살짝 떠오름 (부모 스코프로 우선순위 확보) */
+.menu-grid > li .menu-card:hover,
+.category-grid > li .category-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.55), var(--glow-accent);
+}
+
+/* 위·아래 나무 봉 (양끝에 둥근 손잡이가 삐져나옴) */
+.category-card::before,
+.category-card::after,
+.menu-card::before,
+.menu-card::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  height: 13px;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+  border-radius: 3px;
+  z-index: 4;
+}
+.category-card::before,
+.menu-card::before {
+  top: -8px;
+}
+.category-card::after,
+.menu-card::after {
+  bottom: -8px;
+}
+
+/* 양피지 위 텍스트 색 */
+.menu-card .menu-name {
+  color: #3a2410;
+}
+.menu-card .menu-desc {
+  color: #6b4a24;
+}
+.menu-card .menu-price {
+  color: #8a2f12;
+}
+.category-card .category-name {
+  color: #6b2f0e;
+}
+.menu-tag {
+  background: rgba(255, 244, 214, 0.8);
+  color: #3a2410;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
