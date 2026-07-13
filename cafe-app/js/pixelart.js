@@ -405,5 +405,188 @@
     return small(draw, 80, 60, 0.45);
   }
 
-  window.CAFE_PIXEL = { buildFloor, applyFloor, paperTexture, menuArt, categoryArt };
+  /* ============================================
+     이벤트 카드용 픽셀아트 (48×44, 투명 배경 → 카드 위에 얹음)
+     굵은 픽셀 실루엣: 불 / 따뜻한 커피 / 케이크
+     ============================================ */
+
+  // 🔥 장작 위에서 타는 모닥불
+  function evFlame(g, W, H) {
+    const cx2 = W / 2;
+    // 뾰족한 위 / 넓은 아래(불꽃 갈래). 여러 갈래를 겹쳐 넓은 모닥불로
+    const tongue = (cxT, topY, botY, maxHW, color) => {
+      for (let y = topY; y < botY; y++) {
+        const t = (y - topY) / (botY - topY);
+        const hw = Math.round(maxHW * Math.pow(Math.sin((t * Math.PI) / 2), 0.8));
+        if (hw <= 0) continue;
+        R(g, cxT - hw, y, hw * 2, 1, color);
+      }
+    };
+    // 장작 두 개를 X자로
+    const logStep = (x0, y0, dir, len) => {
+      for (let i = 0; i < len; i++) {
+        R(g, x0 + i, y0 + Math.round((i * dir) / 2), 4, 4, "#5a3418");
+        R(g, x0 + i, y0 + Math.round((i * dir) / 2), 4, 1, "#7a4a24");
+      }
+    };
+    logStep(cx2 - 15, 31, 1, 28); // ＼ 방향
+    logStep(cx2 - 13, 39, -1, 28); // ／ 방향
+    R(g, cx2 - 15, 40, 4, 3, "#3a2110"); // 통나무 마구리
+    R(g, cx2 + 11, 40, 4, 3, "#3a2110");
+
+    // 바깥 진한 주황 (넓은 밑동)
+    tongue(cx2, 12, 34, 6, "#b8431a");
+    tongue(cx2 - 9, 20, 34, 5, "#b8431a");
+    tongue(cx2 + 9, 19, 34, 5, "#b8431a");
+    // 중간 주황
+    tongue(cx2, 17, 33, 4.2, "#f28a2a");
+    tongue(cx2 - 6, 23, 33, 3.4, "#f28a2a");
+    tongue(cx2 + 6, 22, 33, 3.4, "#f28a2a");
+    // 안쪽 노랑
+    tongue(cx2, 22, 32, 2.6, "#ffd75e");
+    tongue(cx2 - 5, 26, 32, 1.8, "#ffd75e");
+    tongue(cx2 + 5, 25, 32, 1.8, "#ffd75e");
+    // 코어 하양
+    tongue(cx2, 26, 31, 1.4, "#fff4d2");
+    // 튀는 불씨
+    R(g, cx2 - 15, 18, 2, 2, "#f0a83c");
+    R(g, cx2 + 14, 22, 2, 2, "#ffd75e");
+    R(g, cx2 - 10, 10, 1, 1, "#ffe08a");
+    R(g, cx2 + 9, 13, 1, 1, "#ffe08a");
+  }
+
+  // ☕ 따뜻한 커피 한 잔 (김 모락모락)
+  function evCoffee(g, W, H) {
+    const cx2 = W / 2;
+    const bx = cx2 - 12,
+      by = 18,
+      bw = 24,
+      bh = 20;
+    // 받침
+    box(g, cx2 - 17, 38, 34, 3, "#e7dcc6");
+    R(g, cx2 - 17, 38, 34, 1, "rgba(0,0,0,0.16)");
+    // 손잡이
+    R(g, bx + bw + 1, by + 4, 6, 3, OL);
+    R(g, bx + bw + 4, by + 6, 3, 7, OL);
+    R(g, bx + bw + 1, by + 12, 6, 3, OL);
+    R(g, bx + bw + 2, by + 7, 2, 5, "#efe6d3");
+    // 컵 몸통
+    box(g, bx, by, bw, bh, "#f4efe3");
+    R(g, bx, by, 4, bh, "#ffffff"); // 좌 하이라이트
+    R(g, bx + bw - 4, by, 4, bh, "#dccfb8"); // 우 음영
+    // 따뜻한 커피 표면 + 크레마
+    R(g, bx + 3, by + 2, bw - 6, 5, "#5a3416");
+    R(g, bx + 3, by + 2, bw - 6, 2, "#a9713a");
+    // 라떼아트 하트
+    R(g, cx2 - 2, by + 3, 2, 2, "#e6cfa4");
+    R(g, cx2 + 1, by + 3, 2, 2, "#e6cfa4");
+    R(g, cx2 - 2, by + 5, 5, 1, "#e6cfa4");
+    R(g, cx2, by + 6, 1, 1, "#e6cfa4");
+    // 김 (모락모락)
+    R(g, cx2 - 6, 6, 2, 4, "rgba(255,255,255,0.6)");
+    R(g, cx2 - 5, 4, 2, 3, "rgba(255,255,255,0.6)");
+    R(g, cx2 + 4, 5, 2, 4, "rgba(255,255,255,0.6)");
+    R(g, cx2 + 3, 3, 2, 3, "rgba(255,255,255,0.6)");
+  }
+
+  // 🍰 조각 케이크 (겹층 + 체리)
+  function evCake(g, W, H) {
+    const cx2 = W / 2;
+    const topY = 19,
+      botY = 38,
+      leftX = cx2 - 15,
+      rightX = cx2 + 15;
+    // 접시
+    box(g, cx2 - 18, 38, 36, 3, "#ddd0b8");
+    R(g, cx2 - 18, 38, 36, 1, "rgba(0,0,0,0.15)");
+    // 쐐기 조각 (왼쪽이 뾰족)
+    for (let y = topY; y < botY; y++) {
+      const t = (y - topY) / (botY - topY);
+      const x0 = Math.round(leftX + (1 - t) * 12);
+      const w = rightX - x0;
+      let color;
+      if (y < topY + 3) color = "#f6e3b0"; // 윗 프로스팅
+      else if (y < topY + 8) color = "#eccb86"; // 스펀지
+      else if (y < topY + 11) color = "#f8efd2"; // 크림층
+      else if (y < topY + 16) color = "#eccb86"; // 스펀지
+      else color = "#d8b06a"; // 바닥
+      R(g, x0, y, w, 1, color);
+      R(g, x0, y, 1, 1, OL); // 왼쪽 사선 외곽
+      R(g, rightX - 1, y, 1, 1, OL); // 오른쪽 외곽
+    }
+    const topX = Math.round(leftX + 12); // 윗변(좁은 쪽) 시작점
+    R(g, topX, topY, rightX - topX, 1, OL); // 윗 외곽 (사다리꼴)
+    R(g, leftX, botY - 1, rightX - leftX, 1, OL); // 바닥 외곽
+    // 크림 돌로 + 체리
+    box(g, cx2 + 1, topY - 4, 9, 5, "#f8efd2");
+    box(g, cx2 + 3, topY - 9, 6, 6, "#d84b3a"); // 체리
+    R(g, cx2 + 4, topY - 8, 2, 2, "#f08a72"); // 체리 하이라이트
+    R(g, cx2 + 7, topY - 12, 1, 4, "#5a3418"); // 꼭지
+  }
+
+  function eventArt(kind) {
+    const draw = (g, W, H) => {
+      if (kind === "coffee") return evCoffee(g, W, H);
+      if (kind === "dessert") return evCake(g, W, H);
+      return evFlame(g, W, H);
+    };
+    return small(draw, 48, 44, 0.45);
+  }
+
+  /* ── 카드게임용 트럼프 카드 뒷면 (투명 배경) ── */
+  function drawCardBack(g, W, H) {
+    box(g, 1, 1, W - 2, H - 2, "#f4ecd8"); // 카드 몸통 + 외곽선
+    R(g, 3, 3, W - 6, H - 6, "#7d2a20"); // 짙은 테두리
+    R(g, 4, 4, W - 8, H - 8, "#b23b2e"); // 크림슨 테두리
+    R(g, 5, 5, W - 10, 1, "#d9a441"); // 금색 안쪽 라인
+    R(g, 5, H - 6, W - 10, 1, "#d9a441");
+    R(g, 6, 6, W - 12, H - 12, "#f4ecd8"); // 안쪽 크림 필드
+    // 마름모 격자 무늬
+    for (let yy = 7; yy < H - 7; yy++) {
+      for (let xx = 7; xx < W - 7; xx++) {
+        if ((xx + yy) % 4 === 0 || (xx - yy + 200) % 4 === 0)
+          R(g, xx, yy, 1, 1, "#e2ab9f");
+      }
+    }
+    // 중앙 마름모 엠블럼
+    const ccx = (W / 2) | 0,
+      ccy = (H / 2) | 0,
+      half = 8;
+    for (let dy = -half; dy <= half; dy++) {
+      const wdt = half - Math.abs(dy);
+      R(g, ccx - wdt, ccy + dy, wdt * 2 + 1, 1, "#b23b2e");
+      R(g, ccx - wdt, ccy + dy, 1, 1, "#d9a441"); // 좌 금테
+      R(g, ccx + wdt, ccy + dy, 1, 1, "#d9a441"); // 우 금테
+    }
+    R(g, ccx - 1, ccy - 3, 2, 5, "#f4ecd8"); // 중앙 하이라이트
+    // 모서리 둥글게 (계단식으로 비움)
+    const corners = [
+      [0, 0, 1, 0, 0, 1],
+      [W - 2, 0, W - 1, 0, W - 1, 1],
+      [0, H - 1, 0, H - 2, 1, H - 1],
+      [W - 2, H - 1, W - 1, H - 2, W - 1, H - 1],
+    ];
+    corners.forEach(([ax, ay, bx, by, cx2, cy2]) => {
+      g.clearRect(ax, ay, 2, 1);
+      g.clearRect(bx, by, 1, 2);
+      g.clearRect(cx2, cy2, 1, 1);
+    });
+  }
+
+  function cardBack() {
+    return small(drawCardBack, 44, 62, 0.35);
+  }
+
+  // 태우기 애니메이션용: 44×62 원본 캔버스를 그대로 반환
+  function cardBackCanvas() {
+    const c = document.createElement("canvas");
+    c.width = 44;
+    c.height = 62;
+    const g = c.getContext("2d");
+    drawCardBack(g, 44, 62);
+    grain(g, 44, 62, 0.35);
+    return c;
+  }
+
+  window.CAFE_PIXEL = { buildFloor, applyFloor, paperTexture, menuArt, categoryArt, eventArt, cardBack, cardBackCanvas };
 })();

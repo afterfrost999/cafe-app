@@ -10,12 +10,14 @@
   <body>
     <header class="admin-header">
       <div class="container header-inner">
-        <a href="../index.html" class="logo">🔴 chimchar cafe 관리자</a>
+        <a href="../index.html" class="logo">Chimchar Cafe 관리자 🔥</a>
         <nav class="nav">
           <a href="../index.html" class="nav-link">대시보드</a>
+          <a href="../events/list.html" class="nav-link">이벤트 관리</a>
+          <a href="../notices/list.html" class="nav-link">공지사항 관리</a>
           <a href="../menus/list.html" class="nav-link">메뉴 관리</a>
           <a href="list.html" class="nav-link active">주문 관리</a>
-          <a href="../../index.html" class="nav-link nav-exit">고객 화면 →</a>
+          <a href="../../index.html" class="nav-link nav-exit">홈 화면 →</a>
         </nav>
       </div>
     </header>
@@ -31,18 +33,20 @@
 
       <!-- 주문 테이블 -->
       <div class="table-wrap" id="table-wrap">
-        <table class="order-table">
-          <thead>
-            <tr>
-              <th>주문번호</th>
-              <th>주문일시</th>
-              <th>메뉴</th>
-              <th class="ta-right">금액</th>
-              <th class="ta-center">상태</th>
-            </tr>
-          </thead>
-          <tbody id="order-body"></tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th>주문번호</th>
+                <th>주문일시</th>
+                <th>메뉴</th>
+                <th class="ta-right">금액</th>
+                <th class="ta-center">상태</th>
+              </tr>
+            </thead>
+            <tbody id="order-body"></tbody>
+          </table>
+        </div>
       </div>
 
       <p class="empty" id="empty" hidden>해당 상태의 주문이 없어요.</p>
@@ -50,6 +54,7 @@
 
     <script src="../../js/data.js"></script>
     <script src="../../js/utils.js"></script>
+    <script src="../../js/pixelart.js"></script>
     <script src="list.js"></script>
   </body>
 </html>

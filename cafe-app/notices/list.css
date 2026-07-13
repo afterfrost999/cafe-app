@@ -1,0 +1,160 @@
+/* ============================================
+   고객 - 공지사항
+   ============================================ */
+
+/* 헤더 (공통 패턴) */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-inner {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.nav-link {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--color-primary);
+}
+
+/* 페이지 (돌아가기 버튼 공간 확보) */
+.page {
+  padding-block: 58px var(--space-xl);
+  max-width: 760px;
+}
+
+.page-head {
+  margin-bottom: var(--space-lg);
+}
+
+.page-head h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
+}
+
+.page-head .text-muted {
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+/* 공지 목록 */
+.notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* 관리 대시보드 카드와 같은 양피지 + 위·아래 나무봉 */
+.notice-card {
+  position: relative;
+  margin-block: 8px;
+  padding: var(--space-lg);
+  overflow: visible;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+}
+
+.notice-card::before,
+.notice-card::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  z-index: 4;
+  height: 13px;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+}
+
+.notice-card::before {
+  top: -8px;
+}
+
+.notice-card::after {
+  bottom: -8px;
+}
+
+.notice-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.notice-title {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: #3a2410;
+}
+
+.notice-date {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: #8a2f12;
+}
+
+.notice-content {
+  font-weight: 700;
+  color: #5e4125;
+  line-height: 1.6;
+}
+
+/* 빈 상태 */
+.empty {
+  padding-block: var(--space-md) var(--space-xl);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 560px) {
+  .page-head h1 {
+    font-size: var(--font-size-xl);
+  }
+  .notice-head {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .nav {
+    gap: var(--space-sm);
+    font-size: var(--font-size-sm);
+  }
+}

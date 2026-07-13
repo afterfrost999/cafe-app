@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>랜덤 메뉴 추천 | Chimchar Cafe</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
+      </div>
+    </header>
+
+    <button class="back-btn" type="button" onclick="history.back()">← 돌아가기</button>
+
+    <main class="recommend-page">
+      <div class="container recommend-main">
+        <div class="recommend-heading">
+          <p class="eyebrow">RANDOM PICK</p>
+          <h1>랜덤 메뉴 추천</h1>
+          <p>무엇을 고를지 고민된다면, 오늘의 한 입을 골라드릴게요.</p>
+        </div>
+
+        <div class="recommend-grid">
+          <div class="floaty">
+            <a class="menu-card recommend-card" href="drink.html">
+              <div class="menu-thumb">
+                <img class="rec-art" data-kind="coffee" alt="음료 픽셀아트" />
+              </div>
+              <div class="menu-body">
+                <h2 class="rec-name">음료</h2>
+                <p class="rec-desc">커피부터 에이드까지, 오늘의 한 잔</p>
+                <span class="rec-cta">음료 추천 받기 →</span>
+              </div>
+            </a>
+          </div>
+
+          <div class="floaty">
+            <a class="menu-card recommend-card" href="dessert.html">
+              <div class="menu-thumb">
+                <img class="rec-art" data-kind="dessert" alt="디저트 픽셀아트" />
+              </div>
+              <div class="menu-body">
+                <h2 class="rec-name">디저트</h2>
+                <p class="rec-desc">달콤하게 마무리할 오늘의 디저트</p>
+                <span class="rec-cta">디저트 추천 받기 →</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/pixelart.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

@@ -75,6 +75,13 @@
 .page-head h1 {
   font-size: var(--font-size-2xl);
   color: var(--color-primary-dark);
+  font-weight: 800;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
+}
+
+.page-head .text-muted {
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
 }
 
 /* 레이아웃 */
@@ -92,23 +99,32 @@
   gap: var(--space-md);
 }
 
+/* 관리 대시보드 카드와 같은 양피지 + 위·아래 나무봉 카드 */
 .cart-item {
+  position: relative;
   display: grid;
   grid-template-columns: 88px 1fr auto;
   gap: var(--space-md);
   align-items: center;
+  margin-block: 8px;
   padding: var(--space-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  overflow: visible;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
 }
+
 
 .cart-thumb {
   width: 88px;
   height: 88px;
   border-radius: var(--radius-md);
   object-fit: cover;
+  image-rendering: pixelated;
+  border: 1px solid rgba(90, 55, 22, 0.4);
 }
 
 .cart-info {
@@ -116,13 +132,15 @@
 }
 
 .cart-name {
-  font-weight: 700;
+  font-weight: 800;
+  color: #3a2410;
   margin-bottom: 2px;
 }
 
 .cart-unit {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-weight: 700;
+  color: #111;
 }
 
 .cart-controls {
@@ -134,41 +152,44 @@
 
 .cart-subtotal {
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: #8a2f12;
 }
 
 .qty-control {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(90, 55, 22, 0.45);
   border-radius: var(--radius-full);
   overflow: hidden;
-  background: var(--color-bg);
+  background: rgba(255, 244, 214, 0.72);
 }
 
 .qty-btn {
   width: 32px;
   height: 32px;
   font-size: 1.1rem;
-  color: var(--color-primary);
+  font-weight: 800;
+  color: #7a4a1e;
   display: grid;
   place-items: center;
   transition: background var(--transition);
 }
 
 .qty-btn:hover {
-  background: var(--color-surface-2);
+  background: rgba(138, 47, 18, 0.16);
 }
 
 .qty-value {
   width: 36px;
   text-align: center;
-  font-weight: 700;
+  font-weight: 800;
+  color: #3a2410;
 }
 
 .cart-remove {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-weight: 700;
+  color: #111;
   transition: color var(--transition);
 }
 
@@ -176,15 +197,56 @@
   color: var(--color-danger);
 }
 
-/* 결제 요약 */
+/* 결제 요약 (관리 대시보드 카드와 같은 양피지 + 나무봉) */
 .summary {
   position: sticky;
-  top: calc(var(--header-height) + var(--space-md));
+  top: calc(var(--header-height) + var(--space-md) + 8px);
+  margin-block: 8px;
   padding: var(--space-lg);
+  overflow: visible;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* 위·아래 나무봉 (대시보드 카드와 동일) */
+.cart-item::before,
+.cart-item::after,
+.summary::before,
+.summary::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  z-index: 4;
+  height: 13px;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+}
+
+.cart-item::before,
+.summary::before {
+  top: -8px;
+}
+
+.cart-item::after,
+.summary::after {
+  bottom: -8px;
 }
 
 .summary-title {
   font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: #3a2410;
   margin-bottom: var(--space-md);
 }
 
@@ -193,29 +255,30 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-sm);
-  color: var(--color-text-muted);
+  color: #111;
+  font-weight: 700;
 }
 
 .summary-row dd {
-  font-weight: 600;
-  color: var(--color-text);
+  font-weight: 800;
+  color: #3a2410;
 }
 
 .summary-divider {
   height: 1px;
-  background: var(--color-divider);
+  background: rgba(90, 55, 22, 0.32);
   margin: var(--space-md) 0;
 }
 
 .summary-final dt {
-  font-weight: 700;
-  color: var(--color-text);
+  font-weight: 800;
+  color: #3a2410;
 }
 
 .summary-final dd {
   font-size: var(--font-size-lg);
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: #8a2f12;
 }
 
 .summary-order {
@@ -231,19 +294,17 @@
   font-size: var(--font-size-sm);
 }
 
-/* 빈 상태 */
+/* 빈 상태 (왼쪽 정렬, 제목 아래) */
 .empty {
-  text-align: center;
-  padding: var(--space-xl);
+  text-align: left;
+  padding: var(--space-md) 0 var(--space-xl);
   color: var(--color-text-muted);
-}
-
-.empty-emoji {
-  font-size: 3rem;
-  margin-bottom: var(--space-sm);
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .empty .btn {
+  display: inline-flex;
   margin-top: var(--space-md);
 }
 

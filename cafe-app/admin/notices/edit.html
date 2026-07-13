@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공지 수정 - Chimchar Cafe 관리자</title>
+    <link rel="stylesheet" href="../../css/variables.css" />
+    <link rel="stylesheet" href="../menus/create.css" />
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="container admin-header__inner">
+        <h1 class="admin-header__title">관리자</h1>
+        <nav class="admin-header__nav">
+          <a href="../index.html" class="admin-header__link">대시보드</a>
+          <a href="../events/list.html" class="admin-header__link">이벤트 관리</a>
+          <a href="list.html" class="admin-header__link is-active">공지사항 관리</a>
+          <a href="../menus/list.html" class="admin-header__link">메뉴 관리</a>
+          <a href="../orders/list.html" class="admin-header__link">주문 관리</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container admin-main">
+      <a href="list.html" class="back-link">← 공지 목록</a>
+      <h2 class="page-heading__title">공지 수정</h2>
+
+      <form id="noticeForm" class="menu-form glass-card" hidden>
+        <div class="form-field">
+          <label for="title">제목</label>
+          <input type="text" id="title" name="title" required />
+        </div>
+
+        <div class="form-field">
+          <label for="content">내용</label>
+          <textarea id="content" name="content" rows="6" required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <a href="list.html" class="btn btn-outline">취소</a>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+      <p class="menu-form__empty" id="emptyState" hidden>
+        공지를 찾을 수 없습니다.
+      </p>
+    </main>
+
+    <script src="../../js/data.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="edit.js"></script>
+  </body>
+</html>

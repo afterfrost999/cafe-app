@@ -12,12 +12,21 @@
     qs,
   } = window.CAFE_UTILS;
 
+  /* 배경을 불규칙 나무 바닥 + 카펫 질감으로 (메뉴 리스트와 동일) */
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${CAFE_PIXEL.paperTexture()})`
+    );
+    CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   const listEl = qs("#order-list");
   const emptyEl = qs("#empty");
   const cartCountEl = qs("#cart-count");
 
   // 헤더 장바구니 카운트
-  cartCountEl.textContent = getCartCount();
+  if (cartCountEl) cartCountEl.textContent = getCartCount();
 
   /** 주문 항목 요약 문구: "아메리카노 외 2개" */
   function itemsLabel(items) {

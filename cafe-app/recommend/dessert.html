@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>랜덤 디저트 추천 | Chimchar Cafe</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="pick.css" />
+  </head>
+  <body data-pick="dessert">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
+      </div>
+    </header>
+
+    <main class="pick-page">
+      <div class="container pick-main">
+        <div class="pick-heading">
+          <p class="eyebrow">RANDOM PICK</p>
+          <h1>랜덤 디저트 추천</h1>
+        </div>
+        <div class="pick-cards" id="pick-cards"></div>
+        <a href="index.html" class="btn btn-outline pick-again">다시 추천받기</a>
+      </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/pixelart.js"></script>
+    <script src="pick.js"></script>
+  </body>
+</html>

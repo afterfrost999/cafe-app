@@ -10,21 +10,13 @@
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="index.html" class="logo">🔥 chimchar cafe <img class="logo-gif" src="assets/chimchar.gif" alt="Chimchar" /></a>
-        <nav class="nav">
-          <a href="menus/list.html" class="nav-link">메뉴</a>
-          <a href="orders/list.html" class="nav-link">주문내역</a>
-          <a href="my/index.html" class="nav-link">마이</a>
-          <a href="basket/list.html" class="nav-link cart-link">
-            🛒 <span id="cart-count" class="cart-count">0</span>
-          </a>
-        </nav>
+        <a href="index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
       </div>
     </header>
 
-    <!-- 픽셀 눈 + 커서 불빛 -->
+    <!-- 픽셀 눈 -->
     <canvas class="snow-canvas" id="snow-canvas" aria-hidden="true"></canvas>
-    <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 
     <main>
       <!-- 히어로 : 코드로 그린 픽셀아트 벽난로 -->
@@ -38,20 +30,19 @@
         <!-- 좌측 세로 바로가기 -->
         <nav class="hero-nav" aria-label="바로가기">
           <a class="hero-nav-item" href="menus/list.html"><span>메뉴</span></a>
-          <a class="hero-nav-item" href="#" data-soon="이벤트"><span>이벤트</span></a>
-          <a class="hero-nav-item" href="#" data-soon="랜덤 메뉴 추천"><span>랜덤 메뉴 추천</span></a>
-          <a class="hero-nav-item" href="basket/list.html"><span>장바구니</span></a>
-          <a class="hero-nav-item" href="orders/list.html"><span>주문내역</span></a>
-          <a class="hero-nav-item" href="my/index.html"><span>마이페이지</span></a>
+          <a class="hero-nav-item" href="notices/list.html"><span>공지사항</span></a>
+          <a class="hero-nav-item" href="events/index.html"><span>이벤트</span></a>
+          <a class="hero-nav-item" href="recommend/index.html"><span>랜덤 메뉴 추천</span></a>
+          <a class="hero-nav-item" href="menus/list.html?favorites=1" data-auth-only hidden><span>찜한 메뉴</span></a>
+          <a class="hero-nav-item" href="basket/list.html" data-auth-only hidden><span>장바구니</span></a>
+          <a class="hero-nav-item" href="orders/list.html" data-auth-only hidden><span>주문내역</span></a>
+          <a class="hero-nav-item" href="my/index.html" data-auth-only hidden><span>마이페이지</span></a>
         </nav>
 
-        <!-- 우측 세로 슬라이더 (빈 메뉴카드 4장 순환) -->
+        <!-- 우측 세로 슬라이더 (이벤트 3장 순환, JS 렌더) -->
         <div class="hero-side" aria-hidden="true">
           <div class="hero-side-slider" id="hero-side-slider">
-            <div class="side-card"></div>
-            <div class="side-card"></div>
-            <div class="side-card"></div>
-            <div class="side-card"></div>
+            <div class="hero-side-indicator" id="hero-side-indicator"></div>
           </div>
         </div>
       </section>
@@ -77,8 +68,8 @@
 
     <footer class="site-footer">
       <div class="container">
-        <p>☕ 카페 · 매일 07:00 - 22:00</p>
-        <p class="text-muted">© 2026 Cafe App. All rights reserved.</p>
+        <p> 오픈 시간 : 매일 07:00 - 22:00</p>
+        <p class="text-muted">© Chimchar Cafe. All rights reserved.</p>
       </div>
     </footer>
 

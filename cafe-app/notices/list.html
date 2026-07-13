@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공지사항 | Chimchar Cafe</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="list.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
+      </div>
+    </header>
+
+    <button class="back-btn" type="button" onclick="history.back()">← 돌아가기</button>
+
+    <main class="container page">
+      <section class="page-head">
+        <h1>공지사항</h1>
+        <p class="text-muted">Chimchar Cafe의 새로운 소식을 확인하세요</p>
+      </section>
+
+      <ul class="notice-list" id="notice-list"></ul>
+
+      <div class="empty" id="empty" hidden>
+        <p>등록된 공지사항이 없어요.</p>
+      </div>
+    </main>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/pixelart.js"></script>
+    <script src="list.js"></script>
+  </body>
+</html>

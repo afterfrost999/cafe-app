@@ -19,7 +19,7 @@
   }
 
   categorySelect.innerHTML = CATEGORIES.map(
-    (c) => `<option value="${c.id}">${c.emoji} ${c.name}</option>`
+    (c) => `<option value="${c.id}">${c.name}</option>`
   ).join("");
 
   form.hidden = false;

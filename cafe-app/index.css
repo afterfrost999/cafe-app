@@ -73,66 +73,6 @@
   image-rendering: pixelated;
 }
 
-/* 커서를 따라다니는 불빛(밝은 주황 불씨) */
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 76px;
-  height: 76px;
-  margin: -38px 0 0 -38px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 214, 150, 0.95),
-    rgba(255, 138, 46, 0.7) 26%,
-    rgba(214, 60, 18, 0.4) 50%,
-    rgba(150, 22, 8, 0.16) 68%,
-    transparent 78%
-  );
-  box-shadow: 0 0 22px 7px rgba(255, 120, 40, 0.38);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  z-index: 210;
-  transform: translate3d(-200px, -200px, 0);
-  transition: transform 18ms linear;
-  will-change: transform;
-}
-
-/* 살아있는 불씨처럼 은은하게 맥동 */
-.cursor-glow::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: inherit;
-  animation: cursor-pulse 1.9s ease-in-out infinite;
-}
-
-@keyframes cursor-pulse {
-  0%,
-  100% {
-    transform: scale(0.86);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.12);
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cursor-glow::before {
-    animation: none;
-  }
-}
-
-@media (hover: none) {
-  .cursor-glow {
-    display: none;
-  }
-}
-
 /* 히어로 : 픽셀아트 벽난로 — 첫 화면(뷰포트)에 전체가 들어오게 */
 .hero {
   position: relative;
@@ -345,11 +285,6 @@
   overflow: hidden;
 }
 
-.category-emoji {
-  font-size: 2.5rem;
-  transition: transform var(--transition);
-}
-
 /* 픽셀아트 카테고리 아이콘 */
 .category-icon {
   width: 76px;
@@ -360,7 +295,6 @@
   transition: transform var(--transition);
 }
 
-.category-card:hover .category-emoji,
 .category-card:hover .category-icon {
   transform: translateY(-6px) scale(1.05);
 }
@@ -718,7 +652,8 @@
 /* 벽지에 오른쪽 변이 맞닿는 직사각형 갈색 테두리 버튼 */
 .hero-nav-item {
   position: relative;
-  flex: 1 1 0; /* 세로로 꽉 채움 */
+  /* 로그인 후 6개 버튼 기준 높이 유지 — 비로그인 시에도 크기가 달라지지 않음 */
+  flex: 0 0 calc((100% - 35px) / 6);
   min-height: 0;
   display: flex;
   align-items: center;
@@ -779,15 +714,55 @@
 .side-card {
   position: absolute;
   inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 16px 10px;
+  text-align: center;
   border-radius: 4px;
   background: var(--scroll-gold-bg);
   background-size: auto, 84px 84px;
   border: 1px solid var(--scroll-gold-border);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  color: #3a2410;
   opacity: 0;
   transform: translateY(18px) scale(0.97);
   transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.side-badge {
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(138, 47, 18, 0.92);
+  color: #fff4d8;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.side-art {
+  width: clamp(60px, 7vw, 88px);
+  height: auto;
   image-rendering: pixelated;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.32));
+}
+
+.side-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #3a2410;
+}
+
+.side-period {
+  margin-top: 3px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #8a2f12;
+  white-space: nowrap;
 }
 
 .side-card.active {
@@ -813,6 +788,32 @@
 }
 .side-card::after {
   bottom: -6px;
+}
+
+.hero-side-indicator {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 10px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.side-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border: 1px solid #8a5f22;
+  border-radius: 50%;
+  background: rgba(207, 154, 62, 0.28);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  transition: width 0.35s ease, background 0.35s ease;
+}
+
+.side-indicator-dot.active {
+  width: 20px;
+  border-radius: 999px;
+  background: #cf9a3e;
 }
 
 /* 좁은 화면에선 씬을 가리지 않게 숨김 */
