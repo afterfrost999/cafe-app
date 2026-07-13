@@ -8,12 +8,32 @@
     formatPrice,
     formatDate,
     getOrders,
+    getCurrentUser,
     getCartCount,
     qs,
   } = window.CAFE_UTILS;
 
+  // 로그인 사용자 이름 표시 (아바타에는 첫 글자)
+  const user = getCurrentUser();
+  const nameEl = qs(".profile-name");
+  const avatarEl = qs(".profile-avatar");
+  if (user) {
+    if (nameEl) nameEl.textContent = `${user.name}님`;
+    if (avatarEl) avatarEl.textContent = user.name.trim().charAt(0);
+  }
+
+  // 배경을 불규칙 나무 바닥 + 카펫 질감으로 (메뉴 리스트와 동일)
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${CAFE_PIXEL.paperTexture()})`
+    );
+    CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   // 헤더 장바구니 카운트
-  qs("#cart-count").textContent = getCartCount();
+  const cartCountEl = qs("#cart-count");
+  if (cartCountEl) cartCountEl.textContent = getCartCount();
 
   const orders = getOrders()
     .slice()

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이벤트 | Chimchar Cafe</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
+      </div>
+    </header>
+
+    <button class="back-btn" type="button" onclick="history.back()">← 돌아가기</button>
+
+    <main class="event-page">
+      <div class="container event-main">
+        <div class="event-heading">
+          <p class="eyebrow">CHIMCHAR SPECIAL</p>
+          <h1>따뜻한 이벤트</h1>
+          <p>오늘의 커피가 조금 더 특별해지는 소식을 만나보세요.</p>
+        </div>
+
+        <section
+          class="event-grid"
+          id="event-grid"
+          aria-label="진행 중인 이벤트"
+        ></section>
+      </div>
+    </main>
+    <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/pixelart.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

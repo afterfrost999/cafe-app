@@ -4,10 +4,10 @@
    ============================================ */
 
 const CATEGORIES = [
-  { id: "coffee", name: "커피", emoji: "☕" },
-  { id: "tea", name: "티", emoji: "🍵" },
-  { id: "ade", name: "에이드/주스", emoji: "🧃" },
-  { id: "dessert", name: "디저트", emoji: "🍰" },
+  { id: "coffee", name: "커피" },
+  { id: "tea", name: "티" },
+  { id: "ade", name: "에이드/주스" },
+  { id: "dessert", name: "디저트" },
 ];
 
 const MENUS = [
@@ -133,6 +133,70 @@ const MENUS = [
   },
 ];
 
+/* 이벤트 (고객 이벤트 페이지 / 관리자 이벤트 관리 공용)
+   kind: 픽셀아트 종류 (fire | coffee | dessert) → 카드 배경/아이콘에 사용 */
+const EVENTS = [
+  {
+    id: 1,
+    kind: "fire",
+    badge: "진행 중",
+    title: "불씨 스탬프 두 배 적립",
+    description:
+      "평일 오후 2시부터 5시까지 모든 음료의 스탬프를 두 배로 적립해 드려요.",
+    period: "2026.07.01 — 2026.07.31",
+  },
+  {
+    id: 2,
+    kind: "coffee",
+    badge: "상시",
+    title: "첫 주문 웰컴 쿠폰",
+    description:
+      "Chimchar Cafe의 첫 주문이라면 원하는 음료를 20% 할인받을 수 있어요.",
+    period: "신규 고객 대상",
+  },
+  {
+    id: 3,
+    kind: "dessert",
+    badge: "주말 한정",
+    title: "디저트 페어링",
+    description:
+      "주말에 커피와 디저트를 함께 주문하면 디저트를 1,000원 할인해 드려요.",
+    period: "매주 토요일·일요일",
+  },
+];
+
+/* 공지사항 (고객 공지 페이지 / 관리자 공지 관리 공용) */
+const NOTICES = [
+  {
+    id: 1,
+    title: "신메뉴 출시 안내",
+    content:
+      "새로운 여름 시즌 메뉴 '흑임자 라떼'와 '청귤 에이드'가 추가됐어요. 고소함과 상큼함을 매장과 앱에서 지금 만나보세요!",
+    createdAt: "2026-07-10T10:00:00",
+  },
+  {
+    id: 2,
+    title: "7월 휴무일 안내",
+    content:
+      "7월 정기 휴무는 매주 월요일입니다. 다만 7월 27일은 내부 사정으로 하루 휴무하며, 그 외 공휴일은 정상 영업하니 방문에 참고 부탁드려요.",
+    createdAt: "2026-07-01T09:00:00",
+  },
+  {
+    id: 3,
+    title: "여름 영업시간 연장 안내",
+    content:
+      "7월과 8월 한정으로 평일 영업시간을 08:00 - 23:00로 연장 운영합니다. 시원한 음료 한 잔과 함께 여유로운 밤 시간을 보내세요.",
+    createdAt: "2026-06-28T14:30:00",
+  },
+  {
+    id: 4,
+    title: "불씨 스탬프 두 배 적립 이벤트",
+    content:
+      "이벤트 기간 동안 평일 오후 2시부터 5시까지 모든 음료의 스탬프를 두 배로 적립해 드려요. 자세한 내용은 이벤트 페이지에서 확인하실 수 있어요.",
+    createdAt: "2026-06-20T11:00:00",
+  },
+];
+
 /* 초기 샘플 주문 (관리자 주문 관리/고객 주문 내역 데모용) */
 const SAMPLE_ORDERS = [
   {
@@ -166,6 +230,8 @@ const ORDER_STATUS = {
 window.CAFE_DATA = {
   CATEGORIES,
   MENUS,
+  EVENTS,
+  NOTICES,
   SAMPLE_ORDERS,
   ORDER_STATUS,
 };

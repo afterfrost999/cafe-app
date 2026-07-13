@@ -10,25 +10,20 @@
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="../index.html" class="logo">🔥 chimchar cafe <img class="logo-gif" src="../assets/chimchar.gif" alt="Chimchar" /></a>
-        <nav class="nav">
-          <a href="../menus/list.html" class="nav-link">메뉴</a>
-          <a href="../orders/list.html" class="nav-link">주문내역</a>
-          <a href="index.html" class="nav-link active">마이</a>
-          <a href="../basket/list.html" class="nav-link cart-link">
-            🛒 <span id="cart-count" class="cart-count">0</span>
-          </a>
-        </nav>
+        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
       </div>
     </header>
 
+    <button class="back-btn" type="button" onclick="history.back()">← 돌아가기</button>
+
     <main class="container page">
       <!-- 프로필 -->
-      <section class="profile glass-card">
-        <div class="profile-avatar">👤</div>
+      <section class="profile">
+        <div class="profile-avatar"></div>
         <div class="profile-info">
           <h1 class="profile-name">게스트님</h1>
-          <p class="text-muted">오늘도 따뜻한 하루 보내세요 ☕</p>
+          <p class="text-muted">오늘도 따뜻한 하루 보내세요</p>
         </div>
       </section>
 
@@ -64,17 +59,17 @@
         <ul class="shortcut-list">
           <li>
             <a href="../orders/list.html" class="shortcut">
-              <span>🧾 주문 내역</span><span class="shortcut-arrow">›</span>
+              <span>주문 내역</span><span class="shortcut-arrow">›</span>
             </a>
           </li>
           <li>
             <a href="../basket/list.html" class="shortcut">
-              <span>🛒 장바구니</span><span class="shortcut-arrow">›</span>
+              <span>장바구니</span><span class="shortcut-arrow">›</span>
             </a>
           </li>
           <li>
             <a href="../menus/list.html" class="shortcut">
-              <span>☕ 메뉴 보기</span><span class="shortcut-arrow">›</span>
+              <span>메뉴 보기</span><span class="shortcut-arrow">›</span>
             </a>
           </li>
         </ul>
@@ -83,6 +78,7 @@
 
     <script src="../js/data.js"></script>
     <script src="../js/utils.js"></script>
+    <script src="../js/pixelart.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

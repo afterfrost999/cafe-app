@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인 | Chimchar Cafe</title>
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="auth.css" />
+  </head>
+  <body data-auth-mode="login">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <nav class="nav" data-auth-nav></nav>
+      </div>
+    </header>
+
+    <button class="back-btn" type="button" onclick="history.back()">← 돌아가기</button>
+
+    <main class="auth-page">
+      <section class="auth-card" aria-labelledby="auth-title">
+        <p class="auth-eyebrow">WELCOME BACK</p>
+        <h1 id="auth-title">로그인</h1>
+        <p class="auth-desc">따뜻한 불씨가 기다리고 있어요.</p>
+
+        <form class="auth-form" id="auth-form">
+          <label>
+            <span>아이디</span>
+            <input name="username" autocomplete="username" required />
+          </label>
+          <label>
+            <span>비밀번호</span>
+            <input type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <p class="auth-error" id="auth-error" role="alert"></p>
+          <button class="auth-submit" type="submit">로그인</button>
+        </form>
+
+        <p class="demo-account">데모 계정 · seungjok / 1234</p>
+        <p class="auth-switch">아직 계정이 없나요? <a href="signup.html">회원가입</a></p>
+      </section>
+    </main>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/pixelart.js"></script>
+    <script src="auth.js"></script>
+  </body>
+</html>

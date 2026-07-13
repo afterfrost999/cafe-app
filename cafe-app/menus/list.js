@@ -10,6 +10,11 @@
     addToCart,
     getCartCount,
     getQueryParam,
+    getCurrentUser,
+    requireLogin,
+    isFavorite,
+    toggleFavorite,
+    setPendingFavorite,
     showToast,
     qs,
   } = window.CAFE_UTILS;
@@ -18,24 +23,41 @@
   const gridEl = qs("#menu-grid");
   const emptyEl = qs("#empty");
   const cartCountEl = qs("#cart-count");
+  const pageTitleEl = qs("#page-title");
+  const pageDescriptionEl = qs("#page-description");
+
+  const favoritesOnly = getQueryParam("favorites") === "1";
+
+  if (favoritesOnly && !getCurrentUser()) {
+    requireLogin();
+    return;
+  }
+
+  if (favoritesOnly) {
+    document.title = "찜한 메뉴 | Chimchar Cafe";
+    pageTitleEl.textContent = "찜한 메뉴";
+    pageDescriptionEl.textContent = "마음에 담아둔 메뉴를 한곳에서 만나보세요";
+    emptyEl.textContent = "아직 찜한 메뉴가 없습니다.";
+    emptyEl.classList.add("favorites-empty");
+  }
 
   // 현재 선택된 카테고리 (URL ?category= 로 초기화)
   let activeCategory = getQueryParam("category") || "all";
 
   /* 장바구니 카운트 갱신 */
   function refreshCartCount() {
-    cartCountEl.textContent = getCartCount();
+    if (cartCountEl) cartCountEl.textContent = getCartCount();
   }
 
   /* 카테고리 탭 렌더 */
   function renderTabs() {
-    const all = [{ id: "all", name: "전체", emoji: "🍽️" }, ...CATEGORIES];
+    const all = [{ id: "all", name: "전체" }, ...CATEGORIES];
     tabsEl.innerHTML = all
       .map(
         (c) => `
           <button class="cat-tab ${c.id === activeCategory ? "active" : ""}"
                   data-category="${c.id}">
-            ${c.emoji} ${c.name}
+            ${c.name}
           </button>`
       )
       .join("");
@@ -51,7 +73,10 @@
 
   /* 메뉴 카드 렌더 */
   function renderMenus() {
-    const menus = getMenusByCategory(activeCategory);
+    const categoryMenus = getMenusByCategory(activeCategory);
+    const menus = favoritesOnly
+      ? categoryMenus.filter((menu) => isFavorite(menu.id))
+      : categoryMenus;
     emptyEl.hidden = menus.length > 0;
 
     gridEl.innerHTML = menus
@@ -62,6 +87,7 @@
         const soldOut = m.soldOut
           ? `<div class="soldout-overlay">품절</div>`
           : "";
+        const favorite = isFavorite(m.id);
         return `
           <li class="floaty">
             <div class="menu-card">
@@ -76,6 +102,14 @@
                   <p class="menu-desc">${m.description}</p>
                 </div>
               </a>
+              <button
+                class="favorite-btn ${favorite ? "is-favorite" : ""}"
+                type="button"
+                data-id="${m.id}"
+                aria-pressed="${favorite}"
+                aria-label="${m.name} ${favorite ? "찜 해제" : "찜하기"}"
+                title="${favorite ? "찜 해제" : "찜하기"}"
+              ><span aria-hidden="true">${favorite ? "♥" : "♡"}</span></button>
               <div class="menu-body" style="padding-top:0">
                 <div class="menu-foot">
                   <span class="menu-price">${formatPrice(m.price)}</span>
@@ -93,10 +127,26 @@
     gridEl.querySelectorAll(".add-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
+        if (!requireLogin()) return;
         const id = Number(btn.dataset.id);
         addToCart(id, 1);
         refreshCartCount();
         showToast("장바구니에 담았어요 🛒");
+      });
+    });
+
+    gridEl.querySelectorAll(".favorite-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.id);
+        if (!getCurrentUser()) {
+          setPendingFavorite(id);
+          requireLogin();
+          return;
+        }
+
+        const favorite = toggleFavorite(id);
+        renderMenus();
+        showToast(favorite ? "찜한 메뉴에 담았어요 ♥" : "찜을 해제했어요");
       });
     });
   }
@@ -107,7 +157,7 @@
       "--paper-tex",
       `url(${CAFE_PIXEL.paperTexture()})`
     );
-    CAFE_PIXEL.applyFloor(document.body, null, false);
+    CAFE_PIXEL.applyFloor(document.body, null, true);
   }
 
   /* 초기화 */

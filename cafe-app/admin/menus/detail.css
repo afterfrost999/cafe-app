@@ -79,6 +79,7 @@
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: var(--radius-md);
+  image-rendering: pixelated;
 }
 
 .menu-detail__body {

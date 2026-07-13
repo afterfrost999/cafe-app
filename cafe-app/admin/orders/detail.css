@@ -2,7 +2,7 @@
    관리자 - 주문 상세
    ============================================ */
 
-/* 관리자 헤더 */
+/* 대시보드와 동일한 관리자 헤더 */
 .admin-header {
   position: sticky;
   top: 0;
@@ -31,7 +31,7 @@
 }
 
 .nav-link {
-  font-weight: 600;
+  font-weight: 700;
   color: rgba(255, 250, 243, 0.65);
   transition: color var(--transition);
 }
@@ -46,48 +46,47 @@
   color: var(--color-accent-light);
 }
 
-/* 페이지 */
+/* 페이지 안의 모든 글자를 굵게 표시 */
 .page {
-  padding-block: var(--space-lg) var(--space-xl);
   max-width: 720px;
+  padding-block: var(--space-lg) var(--space-xl);
+  font-weight: 800;
+}
+
+.page * {
+  font-weight: 800;
 }
 
 .back-link {
   display: inline-block;
   margin-bottom: var(--space-lg);
-  font-weight: 600;
-  color: var(--color-text-muted);
+  color: #f7efe4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.72);
   transition: color var(--transition);
 }
 
 .back-link:hover {
-  color: var(--color-primary);
+  color: var(--color-accent-light);
 }
 
-/* 주문 요약 헤더 */
+/* 주문 요약 */
 .order-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: var(--space-lg);
 }
 
 .order-id {
-  font-size: var(--font-size-lg);
-  font-weight: 800;
-  color: var(--color-primary-dark);
   margin-bottom: 4px;
+  color: #5a2d12;
+  font-size: var(--font-size-lg);
 }
 
 .order-date {
+  color: #5a2d12;
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
 }
 
 .order-status {
@@ -95,26 +94,25 @@
   display: inline-block;
   padding: 4px 14px;
   border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
   color: #fff;
+  font-size: var(--font-size-sm);
 }
 
-/* 섹션 타이틀 */
 .section-title {
-  font-size: var(--font-size-base);
-  color: var(--color-text-muted);
   margin-bottom: var(--space-sm);
+  color: #f7efe4;
+  font-size: var(--font-size-base);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.72);
 }
 
 /* 상태 변경 */
 .status-control {
   padding: var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: var(--space-lg);
+}
+
+.status-control .section-title {
+  color: #4a2b14;
+  text-shadow: none;
 }
 
 .status-btns {
@@ -125,34 +123,26 @@
 
 .status-btn {
   padding: var(--space-sm) var(--space-md);
+  border: 1.5px solid #8a5f22;
   border-radius: var(--radius-full);
-  border: 1.5px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  transition: all var(--transition);
+  background: rgba(255, 232, 177, 0.42);
+  color: #3a2410;
+  transition: border-color var(--transition), color var(--transition),
+    transform var(--transition);
 }
 
 .status-btn:hover {
-  border-color: var(--color-accent);
-  color: var(--color-primary);
+  border-color: #6f1d2c;
+  color: #6f1d2c;
+  transform: translateY(-2px);
 }
 
 .status-btn.active {
-  color: #fff;
   border-color: transparent;
+  color: #fff;
 }
 
 /* 주문 항목 */
-.item-list {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  margin-bottom: var(--space-lg);
-}
-
 .order-item {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -162,37 +152,28 @@
 }
 
 .order-item + .order-item {
-  border-top: 1px solid var(--color-divider);
+  border-top: 1px solid rgba(90, 55, 22, 0.24);
 }
 
 .item-name {
-  font-weight: 700;
+  color: #3a2410;
 }
 
-.item-unit {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
+.item-unit,
 .item-qty {
-  color: var(--color-text-muted);
-  font-weight: 600;
+  color: #5a2d12;
+  font-size: var(--font-size-sm);
 }
 
 .item-subtotal {
-  font-weight: 700;
-  color: var(--color-primary-dark);
   min-width: 80px;
+  color: #8a2f12;
   text-align: right;
 }
 
 /* 결제 요약 */
 .pay-box {
   padding: var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 }
 
 .pay-row {
@@ -200,46 +181,108 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-sm);
-  color: var(--color-text-muted);
+  color: #4a2b14;
 }
 
 .pay-row dd {
-  font-weight: 600;
-  color: var(--color-text);
+  color: #5a2d12;
 }
 
 .pay-divider {
   height: 1px;
-  background: var(--color-divider);
   margin: var(--space-md) 0;
+  background: rgba(90, 55, 22, 0.28);
 }
 
 .pay-final dt {
-  font-weight: 700;
-  color: var(--color-text);
+  color: #3a2410;
 }
 
 .pay-final dd {
+  color: #8a2f12;
   font-size: var(--font-size-lg);
-  font-weight: 800;
-  color: var(--color-primary-dark);
 }
 
-/* not-found */
+/* 주문이 없을 때 */
 .not-found {
-  text-align: center;
   padding: var(--space-xl);
-  color: var(--color-text-muted);
+  color: #4a2b14;
+  text-align: center;
 }
 
 .not-found .back-link {
   margin-top: var(--space-md);
+  color: #6f1d2c;
+  text-shadow: none;
+}
+
+/* 대시보드와 같은 양피지 카드 + 위·아래 나무봉 */
+.order-head,
+.status-control,
+.item-list,
+.pay-box,
+.not-found {
+  position: relative;
+  margin-block: 8px var(--space-lg);
+  overflow: visible;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+}
+
+.order-head::before,
+.order-head::after,
+.status-control::before,
+.status-control::after,
+.item-list::before,
+.item-list::after,
+.pay-box::before,
+.pay-box::after,
+.not-found::before,
+.not-found::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  z-index: 4;
+  height: 13px;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+}
+
+.order-head::before,
+.status-control::before,
+.item-list::before,
+.pay-box::before,
+.not-found::before {
+  top: -8px;
+}
+
+.order-head::after,
+.status-control::after,
+.item-list::after,
+.pay-box::after,
+.not-found::after {
+  bottom: -8px;
+}
+
+@media (max-width: 600px) {
+  .nav {
+    gap: var(--space-sm);
+  }
 }
 
 @media (max-width: 480px) {
   .order-item {
     grid-template-columns: 1fr auto;
   }
+
   .item-qty {
     display: none;
   }

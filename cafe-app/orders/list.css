@@ -63,9 +63,9 @@
   font-weight: 700;
 }
 
-/* 페이지 */
+/* 페이지 (돌아가기 버튼 공간 확보) */
 .page {
-  padding-block: var(--space-xl);
+  padding-block: 58px var(--space-xl);
 }
 
 .page-head {
@@ -75,28 +75,59 @@
 .page-head h1 {
   font-size: var(--font-size-2xl);
   color: var(--color-primary-dark);
+  font-weight: 800;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
+}
+
+.page-head .text-muted {
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
 }
 
 /* 주문 목록 */
 .order-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
+/* 관리 대시보드 카드와 같은 양피지 + 위·아래 나무봉 */
 .order-card {
+  position: relative;
   display: block;
+  margin-block: 8px;
   padding: var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition), box-shadow var(--transition);
+  overflow: visible;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
 }
 
-.order-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+.order-card::before,
+.order-card::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  z-index: 4;
+  height: 13px;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+}
+
+.order-card::before {
+  top: -8px;
+}
+
+.order-card::after {
+  bottom: -8px;
 }
 
 .order-top {
@@ -109,12 +140,13 @@
 
 .order-id {
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: #3a2410;
 }
 
 .order-date {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-weight: 700;
+  color: #6b4a26;
 }
 
 /* 상태 배지 */
@@ -133,12 +165,13 @@
   justify-content: space-between;
   gap: var(--space-sm);
   padding-top: var(--space-sm);
-  border-top: 1px solid var(--color-divider);
+  border-top: 1px solid rgba(90, 55, 22, 0.28);
 }
 
 .order-items {
-  color: var(--color-text);
+  color: #3a2410;
   font-size: var(--font-size-sm);
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -147,7 +180,7 @@
 .order-total {
   flex-shrink: 0;
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: #8a2f12;
 }
 
 /* 빈 상태 */
@@ -155,6 +188,8 @@
   text-align: center;
   padding: var(--space-xl);
   color: var(--color-text-muted);
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .empty-emoji {

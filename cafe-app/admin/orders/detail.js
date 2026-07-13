@@ -3,6 +3,14 @@
    ============================================ */
 
 (function () {
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${window.CAFE_PIXEL.paperTexture()})`
+    );
+    window.CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   const { ORDER_STATUS } = window.CAFE_DATA;
   const {
     formatPrice,

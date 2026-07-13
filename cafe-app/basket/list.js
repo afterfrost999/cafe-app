@@ -17,6 +17,15 @@
     qs,
   } = window.CAFE_UTILS;
 
+  /* 배경을 불규칙 나무 바닥 + 카펫 질감으로 (메뉴 리스트와 동일) */
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${CAFE_PIXEL.paperTexture()})`
+    );
+    CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   const listEl = qs("#cart-list");
   const summaryEl = qs("#summary");
   const emptyEl = qs("#empty");
@@ -35,7 +44,7 @@
     listEl.hidden = isEmpty;
     summaryEl.hidden = isEmpty;
 
-    cartCountEl.textContent = getCartCount();
+    if (cartCountEl) cartCountEl.textContent = getCartCount();
 
     if (isEmpty) return;
 
@@ -47,7 +56,7 @@
         const subtotal = menu.price * item.qty;
         return `
           <li class="cart-item" data-id="${menu.id}">
-            <img class="cart-thumb" src="${menu.image}" alt="${menu.name}" />
+            <img class="cart-thumb" src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(menu) : menu.image}" alt="${menu.name}" />
             <div class="cart-info">
               <p class="cart-name">${menu.name}</p>
               <p class="cart-unit">${formatPrice(menu.price)}</p>

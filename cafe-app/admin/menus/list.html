@@ -9,12 +9,15 @@
 </head>
 <body>
   <header class="admin-header">
-    <div class="container admin-header__inner">
-      <h1 class="admin-header__title">☕ 관리자</h1>
-      <nav class="admin-header__nav">
-        <a href="../index.html" class="admin-header__link">대시보드</a>
-        <a href="list.html" class="admin-header__link is-active">메뉴 관리</a>
-        <a href="../orders/list.html" class="admin-header__link">주문 관리</a>
+    <div class="container header-inner">
+      <a href="../index.html" class="logo">Chimchar Cafe 관리자 🔥</a>
+      <nav class="nav">
+        <a href="../index.html" class="nav-link">대시보드</a>
+        <a href="../events/list.html" class="nav-link">이벤트 관리</a>
+        <a href="../notices/list.html" class="nav-link">공지사항 관리</a>
+        <a href="list.html" class="nav-link active">메뉴 관리</a>
+        <a href="../orders/list.html" class="nav-link">주문 관리</a>
+        <a href="../../index.html" class="nav-link nav-exit">홈 화면 →</a>
       </nav>
     </div>
   </header>
@@ -28,25 +31,28 @@
     <div class="filter-tabs" id="filterTabs"></div>
 
     <div class="menu-table-wrap glass-card">
-      <table class="menu-table">
-        <thead>
-          <tr>
-            <th class="menu-table__img-col"></th>
-            <th>메뉴명</th>
-            <th>카테고리</th>
-            <th>가격</th>
-            <th>상태</th>
-            <th class="menu-table__actions-col">관리</th>
-          </tr>
-        </thead>
-        <tbody id="menuTableBody"></tbody>
-      </table>
+      <div class="menu-table-scroll">
+        <table class="menu-table">
+          <thead>
+            <tr>
+              <th class="menu-table__img-col"></th>
+              <th>메뉴명</th>
+              <th>카테고리</th>
+              <th>가격</th>
+              <th>상태</th>
+              <th class="menu-table__actions-col">관리</th>
+            </tr>
+          </thead>
+          <tbody id="menuTableBody"></tbody>
+        </table>
+      </div>
       <p class="menu-table__empty" id="emptyState" hidden>등록된 메뉴가 없습니다.</p>
     </div>
   </main>
 
   <script src="../../js/data.js"></script>
   <script src="../../js/utils.js"></script>
+  <script src="../../js/pixelart.js"></script>
   <script src="list.js"></script>
 </body>
 </html>

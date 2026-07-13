@@ -13,8 +13,18 @@
     qs,
   } = window.CAFE_UTILS;
 
+  /* 배경을 불규칙 나무 바닥 + 카펫 질감으로 (메뉴 리스트와 동일) */
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${CAFE_PIXEL.paperTexture()})`
+    );
+    CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   const detailEl = qs("#detail");
-  qs("#cart-count").textContent = getCartCount();
+  const cartCountEl = qs("#cart-count");
+  if (cartCountEl) cartCountEl.textContent = getCartCount();
 
   const id = getQueryParam("id");
   const order = getOrderById(id);

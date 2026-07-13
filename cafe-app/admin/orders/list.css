@@ -112,11 +112,19 @@
 
 /* 주문 테이블 */
 .table-wrap {
+  position: relative;
+  margin-block: 8px;
+  overflow: visible;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+  color: #3a2410;
+}
+
+.table-scroll {
   overflow-x: auto;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 }
 
 .order-table {
@@ -134,12 +142,12 @@
 
 .order-table thead th {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  border-bottom: 1px solid var(--color-divider);
+  color: #6b4a24;
+  border-bottom: 1px solid rgba(90, 55, 22, 0.28);
 }
 
 .order-table tbody tr {
-  border-bottom: 1px solid var(--color-divider);
+  border-bottom: 1px solid rgba(90, 55, 22, 0.22);
   cursor: pointer;
   transition: background var(--transition);
 }
@@ -149,7 +157,7 @@
 }
 
 .order-table tbody tr:hover {
-  background: var(--color-surface-2);
+  background: rgba(255, 234, 178, 0.24);
 }
 
 .order-id {
@@ -158,7 +166,8 @@
 }
 
 .order-menu {
-  color: var(--color-text-muted);
+  color: #6b4a24;
+  font-weight: 800;
   max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -177,6 +186,11 @@
   color: var(--color-primary-dark);
 }
 
+.order-table tbody td:nth-child(2) {
+  font-weight: 800;
+  color: #5a2d12;
+}
+
 .status-badge {
   display: inline-block;
   padding: 2px 10px;
@@ -188,12 +202,45 @@
 
 /* 빈 상태 */
 .empty {
+  position: relative;
+  margin-block: 8px;
   padding: var(--space-xl);
   text-align: center;
-  color: var(--color-text-muted);
-  background: var(--color-surface);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
+  color: #6b4a24;
+  font-weight: 700;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  border: 1px dashed var(--scroll-gold-border);
+  border-radius: 3px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+}
+
+.table-wrap::before,
+.table-wrap::after,
+.empty::before,
+.empty::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  z-index: 4;
+  height: 13px;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+}
+
+.table-wrap::before,
+.empty::before {
+  top: -8px;
+}
+
+.table-wrap::after,
+.empty::after {
+  bottom: -8px;
 }
 
 @media (max-width: 600px) {

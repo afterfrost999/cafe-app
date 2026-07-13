@@ -10,6 +10,7 @@
     getQueryParam,
     addToCart,
     getCartCount,
+    requireLogin,
     showToast,
     qs,
   } = window.CAFE_UTILS;
@@ -18,7 +19,7 @@
   const cartCountEl = qs("#cart-count");
 
   function refreshCartCount() {
-    cartCountEl.textContent = getCartCount();
+    if (cartCountEl) cartCountEl.textContent = getCartCount();
   }
   refreshCartCount();
 
@@ -49,7 +50,7 @@
       ${soldOut}
     </div>
     <div class="detail-info">
-      <span class="detail-cat">${category ? category.emoji + " " + category.name : ""}</span>
+      <span class="detail-cat">${category ? category.name : ""}</span>
       <h1 class="detail-name">${menu.name}</h1>
       <div class="detail-tags">${tags}</div>
       <p class="detail-desc">${menu.description}</p>
@@ -68,9 +69,6 @@
         <button class="btn btn-outline" id="btn-cart" ${
           menu.soldOut ? "disabled" : ""
         }>장바구니 담기</button>
-        <button class="btn btn-primary" id="btn-order" ${
-          menu.soldOut ? "disabled" : ""
-        }>바로 주문</button>
       </div>
     </div>`;
 
@@ -88,14 +86,10 @@
 
   /* 장바구니 담기 */
   qs("#btn-cart").addEventListener("click", () => {
+    if (!requireLogin()) return;
     addToCart(menu.id, qty);
     refreshCartCount();
     showToast(`${menu.name} ${qty}개를 담았어요 🛒`);
   });
 
-  /* 바로 주문 → 담고 장바구니로 이동 */
-  qs("#btn-order").addEventListener("click", () => {
-    addToCart(menu.id, qty);
-    window.location.href = "../basket/list.html";
-  });
 })();

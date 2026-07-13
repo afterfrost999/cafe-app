@@ -12,6 +12,15 @@
     qs,
   } = window.CAFE_UTILS;
 
+  /* 랜딩 두 번째 섹션과 동일한 픽셀 나무 바닥·카펫 */
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${window.CAFE_PIXEL.paperTexture()})`
+    );
+    window.CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   const orders = getOrders()
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

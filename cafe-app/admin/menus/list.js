@@ -3,6 +3,14 @@
    ============================================ */
 
 (function () {
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${window.CAFE_PIXEL.paperTexture()})`
+    );
+    window.CAFE_PIXEL.applyFloor(document.body, null, true);
+  }
+
   const { CATEGORIES } = window.CAFE_DATA;
   const {
     getMenusByCategory,
@@ -21,11 +29,11 @@
 
   function categoryName(categoryId) {
     const category = CATEGORIES.find((c) => c.id === categoryId);
-    return category ? `${category.emoji} ${category.name}` : categoryId;
+    return category ? category.name : categoryId;
   }
 
   function renderTabs() {
-    const tabs = [{ id: "all", name: "전체", emoji: "🗂️" }, ...CATEGORIES];
+    const tabs = [{ id: "all", name: "전체" }, ...CATEGORIES];
     filterTabs.innerHTML = tabs
       .map(
         (tab) => `
@@ -33,7 +41,7 @@
           type="button"
           class="filter-tab ${tab.id === activeCategory ? "is-active" : ""}"
           data-category="${tab.id}"
-        >${tab.emoji} ${tab.name}</button>
+        >${tab.name}</button>
       `
       )
       .join("");
@@ -47,7 +55,7 @@
       .map(
         (menu) => `
         <tr data-id="${menu.id}">
-          <td><img class="menu-row__thumb" src="${menu.image}" alt="${menu.name}" /></td>
+          <td><img class="menu-row__thumb" src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(menu) : menu.image}" alt="${menu.name}" /></td>
           <td>
             <a class="menu-row__name menu-row__name-link" href="detail.html?id=${menu.id}">${menu.name}</a>
           </td>

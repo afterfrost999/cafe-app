@@ -63,19 +63,25 @@
   font-weight: 700;
 }
 
-/* 페이지 */
+/* 페이지 (돌아가기 버튼 공간 확보) */
 .page {
-  padding-block: var(--space-xl);
+  padding-block: 64px var(--space-xl);
   max-width: 760px;
 }
 
-/* 프로필 */
+/* 프로필 (양피지 카드) */
 .profile {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
   padding: var(--space-lg);
   margin-bottom: var(--space-lg);
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
 }
 
 .profile-avatar {
@@ -84,22 +90,31 @@
   border-radius: var(--radius-full);
   display: grid;
   place-items: center;
-  font-size: 2rem;
-  background: var(--color-surface-2);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #3a2410;
+  background: rgba(90, 55, 22, 0.28);
+  border: 1px solid var(--scroll-gold-border);
   flex-shrink: 0;
 }
 
 .profile-name {
   font-size: var(--font-size-xl);
-  color: var(--color-primary-dark);
+  font-weight: 800;
+  color: #3a2410;
   margin-bottom: 2px;
 }
 
-/* 통계 타일 */
+.profile .text-muted {
+  font-weight: 700;
+  color: #6b4a26;
+}
+
+/* 통계 타일 (양피지 카드) */
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-md);
+  gap: var(--space-lg);
   margin-bottom: var(--space-xl);
 }
 
@@ -108,22 +123,24 @@
   flex-direction: column;
   gap: var(--space-xs);
   padding: var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
 }
 
 .stat-label {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  font-weight: 600;
+  color: #6b4a26;
+  font-weight: 700;
 }
 
 .stat-value {
   font-size: var(--font-size-lg);
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: #8a2f12;
 }
 
 /* 섹션 */
@@ -140,7 +157,9 @@
 
 .section-title {
   font-size: var(--font-size-lg);
+  font-weight: 800;
   color: var(--color-primary-dark);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
   margin-bottom: var(--space-md);
 }
 
@@ -149,9 +168,10 @@
 }
 
 .section-more {
-  font-weight: 600;
+  font-weight: 800;
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  color: var(--color-primary-light);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: color var(--transition);
 }
 
@@ -159,11 +179,11 @@
   color: var(--color-primary);
 }
 
-/* 최근 주문 */
+/* 최근 주문 (양피지 카드) */
 .recent-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-lg);
 }
 
 .recent-card {
@@ -172,16 +192,12 @@
   justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition), box-shadow var(--transition);
-}
-
-.recent-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
 }
 
 .recent-main {
@@ -189,7 +205,8 @@
 }
 
 .recent-items {
-  font-weight: 700;
+  font-weight: 800;
+  color: #3a2410;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -197,7 +214,8 @@
 
 .recent-date {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-weight: 700;
+  color: #6b4a26;
 }
 
 .recent-right {
@@ -218,14 +236,14 @@
 
 .recent-total {
   font-weight: 800;
-  color: var(--color-primary-dark);
+  color: #8a2f12;
 }
 
-/* 바로가기 */
+/* 바로가기 (양피지 카드) */
 .shortcut-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .shortcut {
@@ -233,30 +251,76 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-md) var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  transition: background var(--transition);
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+  transition: transform var(--transition);
 }
 
 .shortcut:hover {
-  background: var(--color-surface-2);
+  transform: translateX(3px);
 }
 
 .shortcut-arrow {
-  color: var(--color-text-muted);
+  color: #8a2f12;
   font-size: var(--font-size-lg);
 }
 
-/* 빈 상태 */
+/* 빈 상태 (양피지) */
 .empty {
   padding: var(--space-lg);
   text-align: center;
-  color: var(--color-text-muted);
-  background: var(--color-surface);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
+  font-weight: 700;
+  color: #6b4a26;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  border: 1px dashed var(--scroll-gold-border);
+  border-radius: 3px;
+}
+
+/* 위·아래 나무봉 (관리 대시보드 카드와 동일) */
+.profile,
+.stat-tile,
+.recent-card {
+  position: relative;
+  margin-block: 8px;
+  overflow: visible;
+}
+
+.profile::before,
+.profile::after,
+.stat-tile::before,
+.stat-tile::after,
+.recent-card::before,
+.recent-card::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  z-index: 4;
+  height: 13px;
+  border-radius: 3px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+}
+
+.profile::before,
+.stat-tile::before,
+.recent-card::before {
+  top: -8px;
+}
+
+.profile::after,
+.stat-tile::after,
+.recent-card::after {
+  bottom: -8px;
 }
 
 @media (max-width: 600px) {
