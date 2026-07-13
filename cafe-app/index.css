@@ -73,26 +73,58 @@
   image-rendering: pixelated;
 }
 
-/* 커서를 따라다니는 불빛(어두운 빨강) */
+/* 커서를 따라다니는 불빛(밝은 주황 불씨) */
 .cursor-glow {
   position: fixed;
   top: 0;
   left: 0;
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
+  width: 76px;
+  height: 76px;
+  margin: -38px 0 0 -38px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(200, 45, 18, 0.55),
-    rgba(150, 22, 8, 0.22) 45%,
-    transparent 70%
+    rgba(255, 214, 150, 0.95),
+    rgba(255, 138, 46, 0.7) 26%,
+    rgba(214, 60, 18, 0.4) 50%,
+    rgba(150, 22, 8, 0.16) 68%,
+    transparent 78%
   );
+  box-shadow: 0 0 22px 7px rgba(255, 120, 40, 0.38);
   mix-blend-mode: screen;
   pointer-events: none;
   z-index: 210;
-  transform: translate(-200px, -200px);
-  transition: transform 0.05s linear;
+  transform: translate3d(-200px, -200px, 0);
+  transition: transform 18ms linear;
+  will-change: transform;
+}
+
+/* 살아있는 불씨처럼 은은하게 맥동 */
+.cursor-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: cursor-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes cursor-pulse {
+  0%,
+  100% {
+    transform: scale(0.86);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-glow::before {
+    animation: none;
+  }
 }
 
 @media (hover: none) {
@@ -222,11 +254,21 @@
   font-size: var(--font-size-base);
 }
 
+/* 하단 섹션 나무 바닥 텍스처 + 픽셀아트 메뉴 그림 — 픽셀 유지 */
+.lower-panel,
+.site-footer {
+  image-rendering: pixelated;
+}
+.menu-thumb img {
+  image-rendering: pixelated;
+}
+
 /* 하단 패널 — 히어로 위로 올라온 다른 페이지처럼 */
 .lower-panel {
+  --panel-overlap: clamp(56px, 8vh, 76px);
   position: relative;
   z-index: 1;
-  margin-top: var(--space-xl);
+  margin-top: calc(var(--panel-overlap) * -1);
   background: var(--color-panel);
   border-top: 1px solid var(--color-border);
   border-top-left-radius: 44px;
@@ -308,8 +350,19 @@
   transition: transform var(--transition);
 }
 
-.category-card:hover .category-emoji {
-  transform: translateY(-6px);
+/* 픽셀아트 카테고리 아이콘 */
+.category-icon {
+  width: 76px;
+  height: 57px;
+  border-radius: 3px;
+  border: 1px solid #b9832f;
+  image-rendering: pixelated;
+  transition: transform var(--transition);
+}
+
+.category-card:hover .category-emoji,
+.category-card:hover .category-icon {
+  transform: translateY(-6px) scale(1.05);
 }
 
 /* 이름은 처음엔 숨겨두고(첫 화면에 안 보임), 호버 시 아래에서 떠오름 */
@@ -574,5 +627,198 @@
   }
   .nav {
     gap: var(--space-sm);
+  }
+}
+
+/* ============================================
+   두루마리(스크롤) 카드 — 위·아래 나무 봉 + 모서리 손잡이
+   ============================================ */
+.category-card,
+.menu-card {
+  position: relative;
+  border-radius: 3px; /* 각진 모서리 */
+  background: var(--scroll-gold-bg); /* 슬라이더와 같은 골드 톤 */
+  background-size: auto, 84px 84px;
+  border: 1px solid var(--scroll-gold-border);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+  color: #3a2410;
+  overflow: visible;
+  margin-block: 8px; /* 봉이 이웃 카드와 겹치지 않게 */
+}
+
+/* 호버 시 살짝 떠오름 (부모 스코프로 우선순위 확보) */
+.menu-grid > li .menu-card:hover,
+.category-grid > li .category-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.55), var(--glow-accent);
+}
+
+/* 위·아래 나무 봉 (양끝에 둥근 손잡이가 삐져나옴) */
+.category-card::before,
+.category-card::after,
+.menu-card::before,
+.menu-card::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  right: -7px;
+  height: 13px;
+  background:
+    radial-gradient(circle at 7px 55%, #241608 0 5.5px, transparent 6px),
+    radial-gradient(circle at calc(100% - 7px) 55%, #241608 0 5.5px, transparent 6px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 9px, #3f2712 9px 13px);
+  border-radius: 3px;
+  z-index: 4;
+}
+.category-card::before,
+.menu-card::before {
+  top: -8px;
+}
+.category-card::after,
+.menu-card::after {
+  bottom: -8px;
+}
+
+/* 양피지 위 텍스트 색 */
+.menu-card .menu-name {
+  color: #3a2410;
+}
+.menu-card .menu-price {
+  color: #8a2f12;
+}
+.category-card .category-name {
+  color: #6b2f0e;
+}
+.menu-tag {
+  background: rgba(255, 244, 214, 0.8);
+  color: #3a2410;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ============================================
+   히어로 좌측 세로 바로가기 + 우측 세로 슬라이더
+   (1섹션 양쪽 빈 공간 활용)
+   ============================================ */
+.hero-nav {
+  position: absolute;
+  left: 0;
+  top: 6.8%; /* 첫 버튼 윗변 = 하얀 벽지 시작(로직 y15/220) */
+  bottom: auto;
+  height: 50%; /* 높이 절반으로 */
+  z-index: 3;
+  /* JS에서 실제 캔버스 여백을 계산해 하얀 벽지의 왼쪽 경계에 맞춤 */
+  width: var(--hero-scene-gutter, clamp(135px, 18vw, 225px));
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 0;
+}
+
+/* 벽지에 오른쪽 변이 맞닿는 직사각형 갈색 테두리 버튼 */
+.hero-nav-item {
+  position: relative;
+  flex: 1 1 0; /* 세로로 꽉 채움 */
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 18px;
+  color: #2a1c12;
+  font-weight: 800;
+  font-size: 0.86rem;
+  line-height: 1.1;
+  background: #4d3116; /* 갈색 테두리색 (뒷판) */
+  clip-path: none;
+  border-radius: 0;
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.5));
+  transition: transform var(--transition), filter var(--transition);
+}
+
+/* 안쪽 골드 면 (기존 3px보다 3배 두꺼운 9px 테두리) */
+.hero-nav-item::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  clip-path: none;
+  image-rendering: pixelated;
+  z-index: 0;
+}
+
+.hero-nav-item > span {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-nav-item:hover {
+  transform: translateX(6px) scale(1.02);
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.6)) brightness(1.08);
+}
+
+.hero-side {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: clamp(104px, 12vw, 156px);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.hero-side-slider {
+  position: relative;
+  width: 80%;
+  height: 72%;
+  transform: translateY(-12%); /* 살짝 위로 */
+}
+
+.side-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  border: 1px solid var(--scroll-gold-border);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(18px) scale(0.97);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  image-rendering: pixelated;
+}
+
+.side-card.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* 두루마리 봉 */
+.side-card::before,
+.side-card::after {
+  content: "";
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  height: 11px;
+  background: radial-gradient(circle at 6px 55%, #241608 0 4.5px, transparent 5px),
+    radial-gradient(circle at calc(100% - 6px) 55%, #241608 0 4.5px, transparent 5px),
+    linear-gradient(#7a4d2a 0 3px, #5a3720 3px 8px, #3f2712 8px 11px);
+  border-radius: 3px;
+}
+.side-card::before {
+  top: -6px;
+}
+.side-card::after {
+  bottom: -6px;
+}
+
+/* 좁은 화면에선 씬을 가리지 않게 숨김 */
+@media (max-width: 900px) {
+  .hero-nav,
+  .hero-side {
+    display: none;
   }
 }

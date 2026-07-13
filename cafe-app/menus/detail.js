@@ -45,7 +45,7 @@
 
   detailEl.innerHTML = `
     <div class="detail-media">
-      <img src="${menu.image}" alt="${menu.name}" />
+      <img src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(menu) : menu.image}" alt="${menu.name}" />
       ${soldOut}
     </div>
     <div class="detail-info">

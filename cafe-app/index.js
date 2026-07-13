@@ -12,16 +12,19 @@
   // 헤더 장바구니 카운트
   qs("#cart-count").textContent = getCartCount();
 
-  /* 카테고리 바로가기 렌더 */
-  categoryGridEl.innerHTML = CATEGORIES.map(
-    (c) => `
+  /* 카테고리 바로가기 렌더 (아이콘은 메뉴와 같은 픽셀아트) */
+  categoryGridEl.innerHTML = CATEGORIES.map((c) => {
+    const icon = window.CAFE_PIXEL
+      ? `<img class="category-icon" src="${CAFE_PIXEL.categoryArt(c.id)}" alt="" />`
+      : `<span class="category-emoji">${c.emoji}</span>`;
+    return `
       <li>
         <a class="category-card" href="menus/list.html?category=${c.id}">
-          <span class="category-emoji">${c.emoji}</span>
+          ${icon}
           <span class="category-name">${c.name}</span>
         </a>
-      </li>`
-  ).join("");
+      </li>`;
+  }).join("");
 
   /* 추천 메뉴: 베스트/신메뉴 태그 우선, 품절 제외, 최대 4개 */
   const menus = getAllMenus().filter((m) => !m.soldOut);
@@ -44,7 +47,7 @@
         <li class="floaty">
           <a class="menu-card" href="menus/detail.html?id=${m.id}">
             <div class="menu-thumb">
-              <img src="${m.image}" alt="${m.name}" loading="lazy" />
+              <img src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(m) : m.image}" alt="${m.name}" loading="lazy" />
               ${tag}
             </div>
             <div class="menu-body">
@@ -133,28 +136,102 @@
       px(bx, "rgba(255,220,170,0.18)", cx - w / 2, cy - h / 2, w, 1); // 윗 하이라이트
     }
 
-    // 장작 단면(원형 + 나이테) — 디바이스 해상도로 매끈하게
-    function drawLogEnd(lcx, lcy, r) {
+    // 장작 나뭇결 톤 (통마다 다른 색감)
+    const woodTones = [
+      { bark: [38, 21, 8], dark: [95, 66, 39], light: [140, 100, 58], pith: [156, 116, 71] },
+      { bark: [30, 17, 8], dark: [84, 57, 33], light: [126, 88, 50], pith: [150, 110, 66] },
+      { bark: [45, 28, 13], dark: [106, 76, 46], light: [152, 110, 66], pith: [170, 128, 80] },
+      { bark: [26, 15, 7], dark: [76, 51, 29], light: [116, 81, 45], pith: [138, 100, 58] },
+    ];
+    const cl = (v) => (v < 0 ? 0 : v > 255 ? 255 : v | 0);
+
+    // 쪼갠 장작 단면(반원/돔) — 평평한 면이 아래, 둥근 껍질이 위. 통마다 제각각 + 살짝 기울임.
+    // lcy 는 평평한 바닥면의 y 좌표, rot 은 기울기(라디안).
+    function drawLogEnd(lcx, lcy, r, seed, rot) {
+      const s = rnd(seed * 2.13 + 4.7);
+      const s2 = rnd(seed * 7.31 + 1.9);
+      const s3 = rnd(seed * 3.77 + 9.1);
+      const tone = woodTones[seed % woodTones.length];
+      const ax = r * (0.95 + s * 0.26); // 가로 반경(폭) → 제각각
+      const ay = r * (0.82 + s2 * 0.24); // 세로 반경(돔 높이)
+      const freq = 6 + s3 * 4; // 나이테 간격
+      const phase = s * 6.28; // 나이테 위상
+      const barkT = 0.8 + s2 * 0.08; // 껍질 두께
+      const pcx = (s - 0.5) * r * 0.35 * SC; // 나이테 중심을 평평면 위에서 살짝 좌우로
+      rot = rot || 0;
+      const cr = Math.cos(rot),
+        sr = Math.sin(rot);
+      // 광원(왼쪽 위)을 통의 로컬 좌표계로
+      const llx = -0.62 * cr + -0.78 * sr,
+        lly = 0.62 * sr + -0.78 * cr;
       const dcx = lcx * SC,
-        dcy = lcy * SC,
-        dr = r * SC;
-      for (let dy = -dr; dy <= dr; dy++) {
-        for (let dx = -dr; dx <= dr; dx++) {
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist > dr) continue;
+        dcy = lcy * SC, // 평평한 바닥면 중심(회전 축)
+        bax = ax * SC,
+        bay = ay * SC;
+      const RR = Math.max(bax, bay) + 2;
+      // 로컬 좌표 → 디바이스 오프셋
+      const l2dx = (lxp, lyp) => lxp * cr - lyp * sr;
+      const l2dy = (lxp, lyp) => lxp * sr + lyp * cr;
+
+      // 접지 그림자 — 아래 통 위에 얹힌 듯 바닥면 아래를 살짝 어둡게
+      bx.fillStyle = "rgba(0,0,0,0.3)";
+      for (let dx = -bax; dx <= bax * 0.9; dx++)
+        bx.fillRect((dcx + dx + SC) | 0, (dcy + bax * 0.06 + 1) | 0, 1, Math.max(1, (SC * 0.7) | 0));
+
+      // 회전된 돔(위쪽 반원)만 그림
+      for (let oy = -RR; oy <= RR; oy++) {
+        for (let ox = -RR; ox <= RR; ox++) {
+          const lxp = ox * cr + oy * sr, // 디바이스 오프셋 → 로컬
+            lyp = -ox * sr + oy * cr;
+          if (lyp > SC * 0.5 || lyp < -bay) continue; // 위쪽 반원만
+          const nx = lxp / bax,
+            ny = lyp / bay,
+            e = nx * nx + ny * ny;
+          if (e > 1) continue;
+          const dist = Math.sqrt(e);
           let col;
-          if (dist > dr - SC * 0.8)
-            col = "#241407"; // 껍질(어두운 테)
+          if (lyp > -SC * 0.8)
+            col = [30, 17, 8]; // 쪼갠 바닥 모서리(어두운 split 면)
+          else if (dist > barkT) col = tone.bark; // 둥근 껍질 면
           else {
-            const ring = Math.sin((dist / dr) * 7.5);
-            col = ring > 0.25 ? "#8a6238" : "#5f4227"; // 나이테
+            const rdx = (lxp - pcx) / bax,
+              rdy = lyp / bay; // 나이테 중심은 바닥면
+            const ring = Math.sin(Math.sqrt(rdx * rdx + rdy * rdy) * freq + phase);
+            col = ring > 0.2 ? tone.light : tone.dark; // 나이테(반원 아치)
           }
-          bx.fillStyle = col;
-          bx.fillRect((dcx + dx) | 0, (dcy + dy) | 0, 1, 1);
+          // 입체 음영: 왼쪽 위 밝게, 오른쪽·가장자리 어둡게
+          let sh = 1 + (nx * llx + ny * lly) * 0.44 - dist * 0.12;
+          if (sh < 0.55) sh = 0.55;
+          else if (sh > 1.38) sh = 1.38;
+          bx.fillStyle = `rgb(${cl(col[0] * sh)},${cl(col[1] * sh)},${cl(col[2] * sh)})`;
+          bx.fillRect((dcx + ox) | 0, (dcy + oy) | 0, 1, 1);
         }
       }
-      bx.fillStyle = "#9a7346"; // 중심
-      bx.fillRect((dcx - SC * 0.5) | 0, (dcy - SC * 0.5) | 0, SC, SC);
+
+      // 중심(pith) — 바닥면 위
+      const pyy = -SC * 0.6;
+      bx.fillStyle = `rgb(${tone.pith[0]},${tone.pith[1]},${tone.pith[2]})`;
+      bx.fillRect(
+        (dcx + l2dx(pcx, pyy) - SC * 0.5) | 0,
+        (dcy + l2dy(pcx, pyy) - SC * 0.5) | 0,
+        SC,
+        SC
+      );
+
+      // 일부 통엔 위로 뻗는 방사형 균열
+      if (s3 > 0.5) {
+        const a = -Math.PI / 2 + (s - 0.5) * 1.4; // 대체로 위쪽 방향
+        const ca = Math.cos(a),
+          sa = Math.sin(a);
+        bx.fillStyle = "rgba(20,11,5,0.7)";
+        for (let t = 1; t < bay * barkT; t++)
+          bx.fillRect(
+            (dcx + l2dx(pcx + ca * t, pyy + sa * t)) | 0,
+            (dcy + l2dy(pcx + ca * t, pyy + sa * t)) | 0,
+            1,
+            1
+          );
+      }
     }
 
     // 디테일한 머그컵 (외곽선 + 다중 톤 + 손잡이 + 커피 + 하이라이트)
@@ -242,10 +319,31 @@
         R("rgba(255,220,170,0.06)", x + 1, 153, 1, 15);
       }
 
-      // ── 나무 바닥 ──
+      // ── 나무 바닥 (불규칙 널판: 엇갈린 이음새 · 판마다 색편차 · 나뭇결) ──
       R("#3a2717", 0, 170, W, H - 170);
-      for (let y = 170; y < H; y += 9) R("rgba(0,0,0,0.25)", 0, y, W, 1);
-      for (let x = 0; x < W; x += 34) R("rgba(0,0,0,0.16)", x, 170, 1, H - 170);
+      {
+        const ph = 9;
+        for (let y = 170; y < H; y += ph) {
+          const hh = Math.min(ph, H - y);
+          let x = -((rnd(y * 2.3) * 44) | 0); // 행마다 엇갈린 시작
+          while (x < W) {
+            const pw = 26 + ((rnd(x * 1.7 + y * 3.1) * 40) | 0); // 26~66 널판 길이
+            const x0 = Math.max(0, x);
+            const w2 = Math.min(W, x + pw) - x0;
+            if (w2 > 0) {
+              const t = rnd(x * 5.3 + y * 1.9);
+              const g = (52 + t * 22) | 0; // 판마다 다른 갈색
+              R(`rgb(${g},${(g * 0.66) | 0},${(g * 0.42) | 0})`, x0, y, w2, hh);
+              const gx = x0 + 1 + ((rnd(x + y) * Math.max(1, w2 - 2)) | 0);
+              R("rgba(0,0,0,0.1)", gx, y, 1, hh); // 나뭇결 세로 줄
+              R("rgba(255,220,170,0.05)", x0, y, w2, 1); // 윗 하이라이트
+            }
+            if (x + pw <= W) R("rgba(0,0,0,0.34)", x + pw - 1, y, 1, hh); // 널판 끝 이음새
+            x += pw;
+          }
+          R("rgba(0,0,0,0.2)", 0, y + hh - 1, W, 1); // 행 사이 가로 이음새
+        }
+      }
 
       // ── 카펫 ──
       drawRug(60, 188, 200, 30);
@@ -345,6 +443,33 @@
         }
       }
 
+      // ── 벽난로 테두리(스톤 트림): 돌 구조 바깥 양옆 + 아치 안쪽 (색 맞게) ──
+      // 바깥 양옆 세로 트림
+      R("#3f2e1c", Sx0 - 1, Sy0, 4, Sy1 - Sy0 - 6);
+      R("#9a805e", Sx0 - 1, Sy0, 1, Sy1 - Sy0 - 6); // 왼쪽 하이라이트
+      R("#6b5238", Sx0 + 2, Sy0, 1, Sy1 - Sy0 - 6);
+      R("#3f2e1c", Sx1 - 3, Sy0, 4, Sy1 - Sy0 - 6);
+      R("#9a805e", Sx1 - 3, Sy0, 1, Sy1 - Sy0 - 6); // 오른쪽 안쪽 밝게
+      R("#241a10", Sx1, Sy0, 1, Sy1 - Sy0 - 6); // 오른쪽 끝 그림자
+      // 아치 안쪽 트림 (곡선)
+      for (let a = 0; a <= Math.PI; a += 0.003) {
+        const lit = Math.cos(a) < 0; // 왼쪽 반원은 밝게
+        for (let r = 1; r <= 3; r++) {
+          const gx = (cx + Math.cos(a) * (AR + r)) * SC;
+          const gy = (archBase - Math.sin(a) * (AR + r)) * SC;
+          bx.fillStyle =
+            r === 1 ? (lit ? "#9a805e" : "#7a6244") : lit ? "#6b5238" : "#4a3826";
+          bx.fillRect(gx | 0, gy | 0, SC, SC);
+        }
+      }
+      // 아치 안쪽 트림 (직선 양옆)
+      for (let y = archBase - 1; y <= B; y++) {
+        R("#9a805e", L - 3, y, 1, 1);
+        R("#6b5238", L - 2, y, 2, 1);
+        R("#6b5238", Rr, y, 2, 1);
+        R("#4a3826", Rr + 2, y, 1, 1);
+      }
+
       // ── 맨틀(나무 선반) ──
       R("#5a3d28", 76, 66, 168, 13);
       R("#75512f", 76, 66, 168, 2);
@@ -388,16 +513,22 @@
 
       // ── 장작 더미(오른쪽) — 아래 3 · 중간 2 · 위 1 피라미드 ──
       {
-        const rows = [3, 2, 1]; // 아래→위 개수
-        const baseX = 202,
-          r = 6,
-          gap = 12.5;
-        let ly = 176;
-        for (const count of rows) {
-          const sx = baseX + (3 - count) * (gap / 2); // 가운데 정렬
-          for (let j = 0; j < count; j++) drawLogEnd(sx + j * gap, ly, r);
-          ly -= gap - 1.5;
-        }
+        // 반원 통나무를 골에 얹어 자연스럽게 쌓음 (아래→위 순서로 그려 겹침 표현)
+        // x: 중심, y: 바닥면, r: 반경, rot: 기울기 — 아래는 넓게, 위는 골 사이에 얹힘
+        const stack = [
+          { x: 198, y: 179, r: 7.5, rot: -0.1 }, // 바닥 왼
+          { x: 212, y: 180, r: 7.1, rot: 0.05 }, // 바닥 가운데
+          { x: 226, y: 178, r: 7.6, rot: 0.12 }, // 바닥 오른
+          { x: 205, y: 173, r: 6.7, rot: -0.16 }, // 둘째줄 왼(골에 얹힘)
+          { x: 219, y: 173, r: 6.5, rot: 0.14 }, // 둘째줄 오른(골에 얹힘)
+          { x: 212, y: 167, r: 6.8, rot: -0.06 }, // 꼭대기
+        ];
+        stack.forEach((L, seed) => {
+          // 통마다 위치 살짝 흔들어 손그림처럼 자연스럽게
+          const jx = (rnd(seed * 4.1 + 2) - 0.5) * 1.4;
+          const jy = (rnd(seed * 6.7 + 5) - 0.5) * 0.9;
+          drawLogEnd(L.x + jx, L.y + jy, L.r, seed, L.rot);
+        });
       }
 
       // ── 맨틀 소품 ──
@@ -537,12 +668,18 @@
     ];
     const FMAX = pal.length - 1;
 
+    // 장작을 던져 넣으면 잠시 불이 확 타오름
+    let fireBoostUntil = 0;
+
     function seedFire() {
+      const boost = performance.now() < fireBoostUntil ? 1.4 : 1;
       for (let x = 0; x < FW; x++) {
         const d = Math.min(x, FW - 1 - x);
         const center = Math.min(1, d / (FW * 0.42)); // 가운데만 뜨겁게
         const flick = 0.7 + 0.3 * rnd(x + Math.random() * 999); // 살짝 흔들
-        heat[(FH - 1) * FW + x] = Math.round(FMAX * center * flick);
+        let v = Math.round(FMAX * center * flick * boost);
+        if (v > FMAX) v = FMAX;
+        heat[(FH - 1) * FW + x] = v;
       }
     }
     function spreadFire() {
@@ -568,6 +705,285 @@
       }
     }
 
+    // ── 장작 더미 클릭 → 불 속으로 장작 던지기 ──
+    // 장작 더미(오른쪽)의 논리 좌표 히트박스
+    const PILE = { x0: 188, y0: 158, x1: 236, y1: 182 };
+    const flyingLogs = [];
+    const sparks = [];
+
+    // 램프/전등(클릭 시 깜빡 + 호버 확대), 액자(호버 확대) 상태
+    const hit = (b, p) =>
+      p.x >= b.x0 && p.x <= b.x1 && p.y >= b.y0 && p.y <= b.y1;
+    const PENDANT_BOX = { x0: 246, y0: 30, x1: 274, y1: 54 };
+    const LANTERN_BOX = { x0: 204, y0: 44, x1: 218, y1: 68 };
+    const lights = {
+      pendant: {
+        cx: 260, cy: 47, r: 26, hover: 0, blinkStart: -1e9,
+        bulb: { x: 256, y: 43, w: 8, h: 7 }, off: "#120c07", warm: [255, 217, 138],
+      },
+      lantern: {
+        cx: 211, cy: 57, r: 17, hover: 0, blinkStart: -1e9,
+        bulb: { x: 207, y: 52, w: 8, h: 10 }, off: "#15100a", warm: [255, 207, 106],
+      },
+    };
+    const BLINK_T = 430; // 한 단계 길이(느리게)
+    const BLINK_N = 2; // 깜빡 횟수
+    let overPendant = false,
+      overLantern = false,
+      overFrame = false,
+      frameHoverT = 0;
+
+    // 화면 좌표 → 캔버스 논리 좌표 (object-fit: contain 보정)
+    function toLogical(clientX, clientY) {
+      const rect = hearth.getBoundingClientRect();
+      const scale = Math.min(rect.width / DW, rect.height / DH);
+      const offX = (rect.width - DW * scale) / 2;
+      const offY = (rect.height - DH * scale) / 2;
+      return {
+        x: (clientX - rect.left - offX) / scale / SC,
+        y: (clientY - rect.top - offY) / scale / SC,
+      };
+    }
+    function inPile(p) {
+      return p.x >= PILE.x0 && p.x <= PILE.x1 && p.y >= PILE.y0 && p.y <= PILE.y1;
+    }
+
+    // ── 차지(누르는 세기) → 궤적 ──
+    const MAX_HOLD = 850; // ms, 이 시간에 최대 힘
+    const THROW_ORIGIN = { x: 212, y: 162 }; // 더미 꼭대기에서 출발
+    let charging = false;
+    let chargeStart = 0;
+
+    const powerFromHold = (ms) => (ms > MAX_HOLD ? 1 : ms < 0 ? 0 : ms / MAX_HOLD);
+    // 힘 0: 불 오른쪽·낮게 → 힘 1: 불 왼쪽·높게
+    const aimForPower = (p) => ({
+      tx: 174 - p * 30, // 174(오른쪽) → 144(왼쪽)
+      ty: 150,
+      arc: 16 + p * 58, // 낮게 → 높게
+    });
+
+    function throwLog(p) {
+      const a = aimForPower(p);
+      flyingLogs.push({
+        x0: THROW_ORIGIN.x + (Math.random() * 6 - 3),
+        y0: THROW_ORIGIN.y,
+        tx: a.tx + (Math.random() * 4 - 2),
+        ty: a.ty,
+        arc: a.arc, // 포물선 높이(힘에 비례)
+        start: performance.now(),
+        dur: 460 + p * 300, // 세게 던질수록 더 오래 낢
+        rot0: -0.35 + Math.random() * 0.2,
+        spin: -(3 + p * 3 + Math.random() * 1.5), // 세게 던질수록 더 빠르게 회전
+      });
+    }
+
+    function burstSparks(x, y) {
+      for (let i = 0; i < 16; i++) {
+        sparks.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 46,
+          vy: -34 - Math.random() * 58,
+          life: 0,
+          ttl: 0.45 + Math.random() * 0.55,
+          size: Math.random() < 0.5 ? 1 : 2,
+          c: Math.random() < 0.5 ? "#ffd27a" : "#ff8a2a",
+        });
+      }
+    }
+
+    // 날아가는 장작 한 개 그리기 (device 좌표, 회전 적용)
+    function drawFlyingLog(lx, ly, rot) {
+      const w = 22 * SC,
+        h = 8 * SC;
+      ctx.save();
+      ctx.translate(lx * SC, ly * SC);
+      ctx.rotate(rot);
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.fillRect(-w / 2, h / 2 - SC, w, SC); // 아래 그림자
+      ctx.fillStyle = "#4a3220"; // 몸통
+      ctx.fillRect(-w / 2, -h / 2, w, h - SC);
+      ctx.fillStyle = "rgba(255,220,170,0.22)"; // 윗 하이라이트
+      ctx.fillRect(-w / 2, -h / 2, w, SC);
+      ctx.fillStyle = "#6a4a30"; // 단면
+      ctx.fillRect(-w / 2, -h / 2, 3 * SC, h - SC);
+      ctx.fillStyle = "#8a6238";
+      ctx.fillRect(-w / 2, -h / 2 + 2 * SC, 3 * SC, 2 * SC); // 나이테
+      ctx.restore();
+    }
+
+    // 날아가는 장작 + 불티 갱신/렌더 (loop 안에서 호출)
+    function updateEffects(now, dt) {
+      for (let i = flyingLogs.length - 1; i >= 0; i--) {
+        const f = flyingLogs[i];
+        const p = (now - f.start) / f.dur;
+        if (p >= 1) {
+          // 착지 → 불 확 타오르고 불티 튐
+          fireBoostUntil = now + 650;
+          burstSparks(f.tx, f.ty);
+          flyingLogs.splice(i, 1);
+          continue;
+        }
+        const x = f.x0 + (f.tx - f.x0) * p;
+        const y = f.y0 + (f.ty - f.y0) * p - Math.sin(Math.PI * p) * f.arc;
+        drawFlyingLog(x, y, f.rot0 + f.spin * p);
+      }
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.life += dt;
+        if (s.life >= s.ttl) {
+          sparks.splice(i, 1);
+          continue;
+        }
+        s.vy += 30 * dt; // 살짝 가라앉음
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        ctx.globalAlpha = Math.max(0, 1 - s.life / s.ttl);
+        ctx.fillStyle = s.c;
+        ctx.fillRect((s.x * SC) | 0, (s.y * SC) | 0, s.size * SC, s.size * SC);
+      }
+      ctx.globalAlpha = 1;
+
+      // 차지 중: 힘이 차오르는 글로우 + 조준 궤적 미리보기
+      if (charging) {
+        const p = powerFromHold(now - chargeStart);
+        const a = aimForPower(p);
+        const gx = THROW_ORIGIN.x * SC,
+          gy = THROW_ORIGIN.y * SC;
+        const rad = (5 + p * 12) * SC;
+        const grad = ctx.createRadialGradient(gx, gy, 0, gx, gy, rad);
+        const pulse = 0.45 + 0.3 * Math.sin(now / 70);
+        grad.addColorStop(0, `rgba(255,200,110,${pulse * (0.5 + p * 0.5)})`);
+        grad.addColorStop(1, "rgba(255,120,40,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(gx, gy, rad, 0, Math.PI * 2);
+        ctx.fill();
+        // 점선 조준 궤적
+        for (let t = 0.06; t < 1; t += 0.075) {
+          const x = THROW_ORIGIN.x + (a.tx - THROW_ORIGIN.x) * t;
+          const y =
+            THROW_ORIGIN.y + (a.ty - THROW_ORIGIN.y) * t - Math.sin(Math.PI * t) * a.arc;
+          ctx.globalAlpha = 0.75 * (1 - t * 0.4);
+          ctx.fillStyle = "#ffcf8a";
+          ctx.fillRect((x * SC) | 0, (y * SC) | 0, SC, SC);
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      // 램프/전등: 호버 시 커지는 빛무리 + 클릭 시 깜빡
+      lights.pendant.hover += ((overPendant ? 1 : 0) - lights.pendant.hover) * 0.2;
+      lights.lantern.hover += ((overLantern ? 1 : 0) - lights.lantern.hover) * 0.2;
+      drawLight(lights.pendant, now);
+      drawLight(lights.lantern, now);
+
+      // 액자: 호버 시 살짝 커짐
+      frameHoverT += ((overFrame ? 1 : 0) - frameHoverT) * 0.2;
+      if (frameHoverT > 0.01) drawFrameHover();
+    }
+
+    function drawLight(l, now) {
+      const scale = 1 + l.hover * 0.12; // 호버 시 아주 살짝만
+      let strength = 0.42 + l.hover * 0.25;
+      let on = true;
+      const el = now - l.blinkStart;
+      const blinking = el >= 0 && el < BLINK_T * BLINK_N * 2;
+      if (blinking) on = Math.floor(el / BLINK_T) % 2 === 1; // 꺼짐→켜짐 순으로 느리게 2번
+      if (!on) {
+        // 꺼짐: 전구를 주변색으로 덮음
+        ctx.fillStyle = l.off;
+        ctx.fillRect(l.bulb.x * SC, l.bulb.y * SC, l.bulb.w * SC, l.bulb.h * SC);
+        strength = 0;
+      } else if (blinking) {
+        strength += 0.6; // 켜질 때 더 밝게
+      }
+      if (strength <= 0) return;
+      const R2 = l.r * scale * SC;
+      const grad = ctx.createRadialGradient(l.cx * SC, l.cy * SC, 0, l.cx * SC, l.cy * SC, R2);
+      grad.addColorStop(0, `rgba(${l.warm[0]},${l.warm[1]},${l.warm[2]},${0.5 * strength})`);
+      grad.addColorStop(1, `rgba(${l.warm[0]},${l.warm[1]},${l.warm[2]},0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(l.cx * SC, l.cy * SC, R2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 호버 시 액자를 중심 기준으로 확대해 덮어 그림 → 커지는 효과
+    function drawFrameHover() {
+      const s = 1 + 0.06 * frameHoverT; // 아주 살짝만
+      const fcx = 133,
+        fcy = 58;
+      const T = (x, y, w, h, c) => {
+        ctx.fillStyle = c;
+        ctx.fillRect(
+          ((fcx + (x - fcx) * s) * SC) | 0,
+          ((fcy + (y - fcy) * s) * SC) | 0,
+          Math.max(1, (w * s * SC) | 0),
+          Math.max(1, (h * s * SC) | 0)
+        );
+      };
+      T(118, 48, 30, 20, "#241812");
+      T(119, 49, 28, 18, "#7a5334");
+      T(121, 51, 24, 14, "#e9dec6");
+      T(123, 53, 20, 1, "#3a2a1c");
+      T(124, 56, 18, 1, "#3a2a1c");
+      T(125, 59, 16, 1, "#3a2a1c");
+      T(124, 62, 18, 1, "#3a2a1c");
+    }
+
+    // ── 이스터에그: 벽난로 위 'COFFEE & WARMTH' 액자를 누르면 메뉴로 ──
+    const FRAME = { x0: 117, y0: 47, x1: 147, y1: 67 };
+    const inFrame = (p) =>
+      p.x >= FRAME.x0 && p.x <= FRAME.x1 && p.y >= FRAME.y0 && p.y <= FRAME.y1;
+
+    // 커서 affordance + 호버 대상 추적 (액자 · 램프 · 전등 · 장작더미)
+    hearth.addEventListener("pointermove", (e) => {
+      const p = toLogical(e.clientX, e.clientY);
+      overFrame = inFrame(p);
+      overPendant = hit(PENDANT_BOX, p);
+      overLantern = hit(LANTERN_BOX, p);
+      if (charging) return; // 차지 중엔 커서 유지
+      hearth.style.cursor =
+        overFrame || overPendant || overLantern || (!reduceMotion && inPile(p))
+          ? "pointer"
+          : "";
+    });
+    hearth.addEventListener("pointerleave", () => {
+      overFrame = overPendant = overLantern = false;
+    });
+
+    // 클릭: 액자 → 메뉴 이동, 램프/전등 → 불 깜빡
+    hearth.addEventListener("click", (e) => {
+      const p = toLogical(e.clientX, e.clientY);
+      if (inFrame(p)) {
+        window.location.href = "menus/list.html";
+        return;
+      }
+      const now = performance.now();
+      if (hit(PENDANT_BOX, p)) lights.pendant.blinkStart = now;
+      if (hit(LANTERN_BOX, p)) lights.lantern.blinkStart = now;
+    });
+
+    if (!reduceMotion) {
+      // 누르는 순간 힘 차오르기 시작
+      hearth.addEventListener("pointerdown", (e) => {
+        if (!inPile(toLogical(e.clientX, e.clientY))) return;
+        charging = true;
+        chargeStart = performance.now();
+        hearth.style.cursor = "grabbing";
+        if (hearth.setPointerCapture) hearth.setPointerCapture(e.pointerId);
+      });
+      // 떼는 순간 힘에 따라 던지기
+      const release = () => {
+        if (!charging) return;
+        charging = false;
+        hearth.style.cursor = "pointer";
+        throwLog(powerFromHold(performance.now() - chargeStart));
+      };
+      hearth.addEventListener("pointerup", release);
+      hearth.addEventListener("pointercancel", () => (charging = false));
+    }
+
     // 초기 워밍업
     seedFire();
     for (let i = 0; i < FH; i++) spreadFire();
@@ -580,11 +996,13 @@
       const loop = (t) => {
         if (t - last > 33) {
           // ~30fps: 뚝뚝 끊기는 픽셀 감성
+          const dt = Math.min(0.05, (t - last) / 1000);
           ctx.clearRect(0, 0, DW, DH);
           ctx.drawImage(bg, 0, 0);
           seedFire();
           spreadFire();
           drawFire();
+          updateEffects(performance.now(), dt);
           last = t;
         }
         requestAnimationFrame(loop);
@@ -593,12 +1011,82 @@
     }
   }
 
+  /* ── 하단 섹션: 벽난로 마루가 이어지는 나무 바닥 + 카펫 러너
+        (질감 생성은 js/pixelart.js 공유 모듈) ── */
+  if (window.CAFE_PIXEL) {
+    document.documentElement.style.setProperty(
+      "--paper-tex",
+      `url(${CAFE_PIXEL.paperTexture()})`
+    );
+    CAFE_PIXEL.applyFloor(qs(".lower-panel"), qs(".site-footer"), true);
+    const lp = qs(".lower-panel");
+    if (lp) lp.style.boxShadow = "0 -24px 60px rgba(0,0,0,0.5)";
+  }
+
   /* ── 커서를 따라다니는 불빛 ── */
   const glow = qs("#cursor-glow");
   if (glow) {
-    window.addEventListener("mousemove", (e) => {
-      glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-    });
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        glow.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      },
+      { passive: true }
+    );
+  }
+
+  /* ── 첫 섹션을 절반가량 지나면 하단 패널로 부드럽게 이동 ── */
+  const hero = qs(".hero");
+  const lowerPanel = qs(".lower-panel");
+  const siteHeader = qs(".site-header");
+  if (hero && lowerPanel) {
+    const reduceScrollMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    let lastScrollY = window.scrollY;
+    let hasSnapped = false;
+    let snapInProgress = false;
+    let snapTimer;
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const currentY = window.scrollY;
+        const movingDown = currentY > lastScrollY;
+        const heroStart = hero.offsetTop;
+        const triggerY = heroStart + hero.offsetHeight * 0.06; // 살짝만 내려도 스냅
+        const headerHeight = siteHeader ? siteHeader.offsetHeight : 0;
+        const targetY = Math.max(0, lowerPanel.offsetTop - headerHeight);
+
+        if (currentY < heroStart + hero.offsetHeight * 0.04) {
+          hasSnapped = false;
+        }
+
+        if (
+          movingDown &&
+          !hasSnapped &&
+          !snapInProgress &&
+          currentY >= triggerY &&
+          currentY < targetY
+        ) {
+          hasSnapped = true;
+          snapInProgress = true;
+          window.scrollTo({
+            top: targetY,
+            behavior: reduceScrollMotion ? "auto" : "smooth",
+          });
+
+          window.clearTimeout(snapTimer);
+          snapTimer = window.setTimeout(() => {
+            snapInProgress = false;
+            lastScrollY = window.scrollY;
+          }, reduceScrollMotion ? 0 : 700);
+        }
+
+        lastScrollY = currentY;
+      },
+      { passive: true }
+    );
   }
 
   /* ── 픽셀 눈 (뷰포트 전체) ── */
@@ -649,5 +1137,54 @@
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
+  }
+
+  /* ── 좌측 세로 바로가기: 미구현 페이지는 안내 토스트 (나중에 href만 교체) ── */
+  document.querySelectorAll(".hero-nav-item[data-soon]").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (window.CAFE_UTILS && CAFE_UTILS.showToast)
+        CAFE_UTILS.showToast(`${a.dataset.soon} 페이지는 준비 중이에요`);
+    });
+  });
+
+  /* ── 좌측 바로가기의 오른쪽 변을 실제 벽지 시작선에 정확히 맞춤 ── */
+  const heroNav = qs(".hero-nav");
+  if (heroNav && hearth) {
+    const alignHeroNavToScene = () => {
+      const canvasBox = hearth.getBoundingClientRect();
+      const sceneRatio = hearth.width / hearth.height;
+      const renderedSceneWidth = Math.min(
+        canvasBox.width,
+        canvasBox.height * sceneRatio
+      );
+      const leftSceneEdge = Math.max(
+        0,
+        (canvasBox.width - renderedSceneWidth) / 2
+      );
+
+      heroNav.style.setProperty(
+        "--hero-scene-gutter",
+        `${leftSceneEdge.toFixed(2)}px`
+      );
+    };
+
+    alignHeroNavToScene();
+    window.addEventListener("resize", alignHeroNavToScene, { passive: true });
+  }
+
+  /* ── 우측 세로 슬라이더: 빈 메뉴카드 4장 자동 순환 ── */
+  const sideCards = document.querySelectorAll("#hero-side-slider .side-card");
+  if (sideCards.length) {
+    let si = 0;
+    sideCards[0].classList.add("active");
+    const reduceSlide = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceSlide) {
+      setInterval(() => {
+        sideCards[si].classList.remove("active");
+        si = (si + 1) % sideCards.length;
+        sideCards[si].classList.add("active");
+      }, 3200);
+    }
   }
 })();
