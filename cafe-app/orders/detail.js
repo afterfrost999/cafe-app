@@ -7,7 +7,7 @@
   const {
     formatPrice,
     formatDate,
-    getOrderById,
+    getMyOrderById,
     getCartCount,
     getQueryParam,
     formatMenuOptions,
@@ -29,7 +29,7 @@
   if (cartCountEl) cartCountEl.textContent = getCartCount();
 
   const id = getQueryParam("id");
-  const order = getOrderById(id);
+  const order = getMyOrderById(id);
 
   /* 주문 없음 */
   if (!order) {

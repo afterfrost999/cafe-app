@@ -167,8 +167,14 @@
 }
 
 .favorite-btn.is-favorite {
-  background: #6f1d2c;
-  color: #fff3d5;
+  background: #fff0c9;
+}
+
+.favorite-heart {
+  width: 22px;
+  height: auto;
+  image-rendering: pixelated;
+  display: block;
 }
 
 .menu-thumb {

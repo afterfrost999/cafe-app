@@ -118,7 +118,13 @@
                 aria-pressed="${favorite}"
                 aria-label="${m.name} ${favorite ? "찜 해제" : "찜하기"}"
                 title="${favorite ? "찜 해제" : "찜하기"}"
-              ><span aria-hidden="true">${favorite ? "♥" : "♡"}</span></button>
+              >${
+                window.CAFE_PIXEL
+                  ? `<img class="favorite-heart" src="${CAFE_PIXEL.heartArt(
+                      favorite
+                    )}" alt="" aria-hidden="true" />`
+                  : `<span aria-hidden="true">${favorite ? "♥" : "♡"}</span>`
+              }</button>
               <div class="menu-body" style="padding-top:0">
                 <div class="menu-foot">
                   <span class="menu-price">${formatPrice(m.price)}</span>
