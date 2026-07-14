@@ -10,7 +10,7 @@
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <a href="../index.html" class="logo">Chimchar Cafe <span class="pixel-flame" aria-hidden="true"></span></a>
         <nav class="nav" data-auth-nav></nav>
       </div>
     </header>
@@ -41,6 +41,16 @@
           <span class="stat-label">진행 중</span>
           <span class="stat-value" id="stat-progress">0건</span>
         </div>
+      </section>
+
+      <!-- 보유 쿠폰 -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">보유 중인 쿠폰</h2>
+          <span class="coupon-count" id="coupon-count">0장</span>
+        </div>
+        <ul class="coupon-list" id="coupon-list"></ul>
+        <p class="empty" id="coupon-empty" hidden>보유 중인 쿠폰이 없어요.</p>
       </section>
 
       <!-- 최근 주문 -->

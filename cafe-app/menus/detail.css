@@ -148,6 +148,115 @@
   margin-bottom: var(--space-lg);
 }
 
+/* 음료 옵션 */
+.menu-options {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.38);
+}
+
+.option-group {
+  border: 0;
+}
+
+.option-group legend {
+  margin-bottom: var(--space-sm);
+  color: #4a2b14;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.option-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.option-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.option-chip span {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 7px 12px;
+  border: 2px solid rgba(90, 55, 22, 0.38);
+  border-radius: 3px;
+  background: rgba(255, 244, 214, 0.65);
+  color: #4a2b14;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.option-chip input:checked + span {
+  border-color: #6f1d2c;
+  background: #6f1d2c;
+  color: #fff3d5;
+}
+
+.option-chip input:focus-visible + span {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.option-group--extras {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.option-group--extras legend {
+  grid-column: 1 / -1;
+}
+
+.option-check {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 2px solid rgba(90, 55, 22, 0.38);
+  border-radius: 3px;
+  background: rgba(255, 244, 214, 0.65);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.option-check input {
+  width: 17px;
+  height: 17px;
+  accent-color: #6f1d2c;
+}
+
+.option-select-label {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.option-select {
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 2px solid rgba(90, 55, 22, 0.38);
+  border-radius: 3px;
+  background: rgba(255, 244, 214, 0.9);
+  color: #3a2410;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
 /* 수량 선택 */
 .qty-row {
   display: flex;
@@ -216,5 +325,13 @@
   }
   .detail-name {
     font-size: var(--font-size-xl);
+  }
+
+  .option-group--extras {
+    grid-template-columns: 1fr;
+  }
+
+  .option-group--extras legend {
+    grid-column: auto;
   }
 }

@@ -11,7 +11,11 @@
     removeFromCart,
     clearCart,
     getCartCount,
-    getCartTotal,
+    getCartPricing,
+    getAvailableCoupons,
+    getCartItemUnitPrice,
+    formatMenuOptions,
+    escapeHTML,
     createOrderFromCart,
     showToast,
     qs,
@@ -33,6 +37,29 @@
   const summaryCountEl = qs("#summary-count");
   const summaryTotalEl = qs("#summary-total");
   const summaryFinalEl = qs("#summary-final");
+  const summaryDiscountEl = qs("#summary-discount");
+  const couponSelectEl = qs("#coupon-select");
+  const couponHelpEl = qs("#coupon-help");
+  const requestEl = qs("#order-request");
+  const requestCountEl = qs("#request-count");
+
+  const availableCoupons = getAvailableCoupons();
+  if (availableCoupons.length > 0) {
+    couponSelectEl.innerHTML = `
+      <option value="">쿠폰 적용 안 함</option>
+      ${availableCoupons
+        .map(
+          (coupon) =>
+            `<option value="${escapeHTML(coupon.id)}">${escapeHTML(
+              coupon.name
+            )} · ${escapeHTML(coupon.benefit)}</option>`
+        )
+        .join("")}`;
+  } else {
+    couponSelectEl.innerHTML = `<option value="">사용 가능한 쿠폰이 없어요</option>`;
+    couponSelectEl.disabled = true;
+    couponHelpEl.textContent = "사용하지 않았고 유효기간이 남은 쿠폰이 없습니다.";
+  }
 
   /* 전체 렌더 */
   function render() {
@@ -53,13 +80,16 @@
       .map((item) => {
         const menu = getMenuById(item.menuId);
         if (!menu) return "";
-        const subtotal = menu.price * item.qty;
+        const unitPrice = getCartItemUnitPrice(item);
+        const subtotal = unitPrice * item.qty;
+        const optionLabel = formatMenuOptions(item.options);
         return `
-          <li class="cart-item" data-id="${menu.id}">
+          <li class="cart-item" data-line-id="${item.lineId}">
             <img class="cart-thumb" src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(menu) : menu.image}" alt="${menu.name}" />
             <div class="cart-info">
               <p class="cart-name">${menu.name}</p>
-              <p class="cart-unit">${formatPrice(menu.price)}</p>
+              ${optionLabel ? `<p class="cart-options">${optionLabel}</p>` : ""}
+              <p class="cart-unit">${formatPrice(unitPrice)}</p>
             </div>
             <div class="cart-controls">
               <span class="cart-subtotal">${formatPrice(subtotal)}</span>
@@ -75,10 +105,18 @@
       .join("");
 
     // 요약 갱신
-    const total = getCartTotal();
+    const pricing = getCartPricing(couponSelectEl.value);
     summaryCountEl.textContent = `${getCartCount()}개`;
-    summaryTotalEl.textContent = formatPrice(total);
-    summaryFinalEl.textContent = formatPrice(total);
+    summaryTotalEl.textContent = formatPrice(pricing.subtotal);
+    summaryDiscountEl.textContent = `-${formatPrice(pricing.discount)}`;
+    summaryFinalEl.textContent = formatPrice(pricing.total);
+    if (couponSelectEl.value) {
+      couponHelpEl.textContent = pricing.discount > 0
+        ? `${pricing.coupon.benefit}이 적용되었습니다.`
+        : "음료 메뉴가 있어야 이 쿠폰을 적용할 수 있어요.";
+    } else if (availableCoupons.length > 0) {
+      couponHelpEl.textContent = "쿠폰을 선택하면 할인 금액이 반영돼요.";
+    }
   }
 
   /* 항목 조작 (이벤트 위임) */
@@ -86,23 +124,28 @@
     const btn = e.target.closest("[data-act]");
     if (!btn) return;
     const li = btn.closest(".cart-item");
-    const id = Number(li.dataset.id);
+    const lineId = li.dataset.lineId;
     const act = btn.dataset.act;
 
     if (act === "remove") {
-      removeFromCart(id);
+      removeFromCart(lineId);
     } else {
-      const current = getCart().find((c) => c.menuId === id);
+      const current = getCart().find((c) => c.lineId === lineId);
       if (!current) return;
       const nextQty = act === "plus" ? current.qty + 1 : current.qty - 1;
-      updateCartQty(id, nextQty); // 0 이하이면 내부에서 제거됨
+      updateCartQty(lineId, nextQty); // 0 이하이면 내부에서 제거됨
     }
     render();
   });
 
   /* 주문하기 */
   qs("#btn-order").addEventListener("click", () => {
-    const order = createOrderFromCart();
+    const fulfillment = qs('input[name="fulfillment"]:checked');
+    const order = createOrderFromCart({
+      fulfillment: fulfillment ? fulfillment.value : "takeout",
+      request: requestEl ? requestEl.value : "",
+      couponId: couponSelectEl ? couponSelectEl.value : "",
+    });
     if (!order) {
       showToast("장바구니가 비어 있어요.");
       return;
@@ -113,6 +156,14 @@
       window.location.href = `../orders/detail.html?id=${order.id}`;
     }, 700);
   });
+
+  couponSelectEl.addEventListener("change", render);
+
+  if (requestEl && requestCountEl) {
+    requestEl.addEventListener("input", () => {
+      requestCountEl.textContent = requestEl.value.length;
+    });
+  }
 
   /* 장바구니 비우기 */
   qs("#btn-clear").addEventListener("click", () => {

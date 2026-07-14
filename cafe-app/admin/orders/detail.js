@@ -19,6 +19,8 @@
     updateOrderStatus,
     getQueryParam,
     showToast,
+    formatMenuOptions,
+    escapeHTML,
     qs,
   } = window.CAFE_UTILS;
 
@@ -41,15 +43,19 @@
   function itemsHtml() {
     return order.items
       .map(
-        (it) => `
+        (it) => {
+          const optionLabel = formatMenuOptions(it.options || {});
+          return `
           <div class="order-item">
             <div>
-              <p class="item-name">${it.name}</p>
+              <p class="item-name">${escapeHTML(it.name)}</p>
+              ${optionLabel ? `<p class="item-options">${escapeHTML(optionLabel)}</p>` : ""}
               <p class="item-unit">${formatPrice(it.price)}</p>
             </div>
             <span class="item-qty">x ${it.qty}</span>
             <span class="item-subtotal">${formatPrice(it.price * it.qty)}</span>
-          </div>`
+          </div>`;
+        }
       )
       .join("");
   }
@@ -72,6 +78,16 @@
       label: order.status,
       color: "var(--color-text-muted)",
     };
+    const fulfillmentLabel = order.fulfillment === "dine-in" ? "매장" : "포장";
+    const requestText = order.request ? escapeHTML(order.request) : "없음";
+    const subtotal = order.subtotal ?? order.total;
+    const discount = order.discount || 0;
+    const couponRow = discount > 0
+      ? `<dl class="pay-row pay-discount">
+          <dt>${escapeHTML(order.coupon?.name || "쿠폰 할인")}</dt>
+          <dd>-${formatPrice(discount)}</dd>
+        </dl>`
+      : "";
     detailEl.innerHTML = `
       <div class="order-head">
         <div>
@@ -81,6 +97,11 @@
         <span class="order-status" style="background:${status.color}">
           ${status.label}
         </span>
+      </div>
+
+      <div class="order-preferences">
+        <dl><dt>이용 방법</dt><dd>${fulfillmentLabel}</dd></dl>
+        <dl><dt>요청사항</dt><dd>${requestText}</dd></dl>
       </div>
 
       <div class="status-control">
@@ -94,8 +115,9 @@
       <div class="pay-box">
         <dl class="pay-row">
           <dt>총 상품금액</dt>
-          <dd>${formatPrice(order.total)}</dd>
+          <dd>${formatPrice(subtotal)}</dd>
         </dl>
+        ${couponRow}
         <div class="pay-divider"></div>
         <dl class="pay-row pay-final">
           <dt>결제 금액</dt>

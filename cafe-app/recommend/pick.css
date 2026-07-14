@@ -137,6 +137,42 @@
   image-rendering: pixelated;
 }
 
+.reveal-favorite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 3px solid #6f1d2c;
+  border-radius: 3px;
+  background: rgba(255, 239, 196, 0.94);
+  color: #6f1d2c;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  line-height: 1;
+  text-shadow: 1px 0 0 currentColor, 0 1px 0 currentColor;
+  box-shadow: 3px 3px 0 rgba(50, 28, 12, 0.55);
+  transition: transform 80ms steps(2, end), background var(--transition),
+    color var(--transition);
+}
+
+.reveal-favorite:hover {
+  transform: scale(1.1);
+  background: #fff0c9;
+}
+
+.reveal-favorite:active {
+  transform: scale(0.92);
+}
+
+.reveal-favorite.is-favorite {
+  background: #6f1d2c;
+  color: #fff3d5;
+}
+
 .reveal-body {
   padding: 10px 8px 12px;
   text-align: center;
@@ -196,6 +232,30 @@
   .pick-cards {
     gap: 10px;
   }
+
+  .pick-slot {
+    width: min(27vw, 116px);
+  }
+
+  .reveal-body {
+    padding: 7px 5px 8px;
+  }
+
+  .reveal-name,
+  .reveal-price,
+  .reveal-add {
+    font-size: 0.68rem;
+  }
+
+  .reveal-favorite {
+    top: 6px;
+    right: 6px;
+    width: 31px;
+    height: 31px;
+    min-height: 31px;
+    font-size: 1.15rem;
+  }
+
   .nav {
     gap: var(--space-sm);
     font-size: var(--font-size-sm);

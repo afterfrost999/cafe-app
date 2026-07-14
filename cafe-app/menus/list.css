@@ -131,6 +131,10 @@
   display: block;
 }
 
+.menu-detail-link.is-sold-out {
+  cursor: not-allowed;
+}
+
 .favorite-btn {
   position: absolute;
   top: 12px;
@@ -296,6 +300,12 @@
   }
   .page-head h1 {
     font-size: var(--font-size-xl);
+  }
+}
+
+@media (max-width: 420px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
   }
 }
 

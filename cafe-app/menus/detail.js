@@ -9,8 +9,11 @@
     getMenuById,
     getQueryParam,
     addToCart,
+    openCartOptionModal,
     getCartCount,
+    getCurrentUser,
     requireLogin,
+    setPendingCartAdd,
     showToast,
     qs,
   } = window.CAFE_UTILS;
@@ -43,7 +46,6 @@
   const soldOut = menu.soldOut
     ? `<div class="detail-soldout">품절</div>`
     : "";
-
   detailEl.innerHTML = `
     <div class="detail-media">
       <img src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(menu) : menu.image}" alt="${menu.name}" />
@@ -54,7 +56,7 @@
       <h1 class="detail-name">${menu.name}</h1>
       <div class="detail-tags">${tags}</div>
       <p class="detail-desc">${menu.description}</p>
-      <p class="detail-price">${formatPrice(menu.price)}</p>
+      <p class="detail-price" id="detail-price">${formatPrice(menu.price)}</p>
 
       <div class="qty-row">
         <span class="qty-label">수량</span>
@@ -68,28 +70,46 @@
       <div class="detail-actions">
         <button class="btn btn-outline" id="btn-cart" ${
           menu.soldOut ? "disabled" : ""
-        }>장바구니 담기</button>
+        }>장바구니 담기 · ${formatPrice(menu.price)}</button>
       </div>
     </div>`;
 
   /* 수량 조절 */
   let qty = 1;
   const qtyValueEl = qs("#qty-value");
+  const priceEl = qs("#detail-price");
+  const cartButton = qs("#btn-cart");
+
+  function refreshPrice() {
+    priceEl.textContent = formatPrice(menu.price);
+    cartButton.textContent = `장바구니 담기 · ${formatPrice(menu.price * qty)}`;
+  }
+
   qs("#qty-minus").addEventListener("click", () => {
     qty = Math.max(1, qty - 1);
     qtyValueEl.textContent = qty;
+    refreshPrice();
   });
   qs("#qty-plus").addEventListener("click", () => {
     qty += 1;
     qtyValueEl.textContent = qty;
+    refreshPrice();
   });
 
   /* 장바구니 담기 */
-  qs("#btn-cart").addEventListener("click", () => {
-    if (!requireLogin()) return;
-    addToCart(menu.id, qty);
+  cartButton.addEventListener("click", async () => {
+    const options = await openCartOptionModal(menu, qty);
+    if (options === null) return;
+    if (!getCurrentUser()) {
+      setPendingCartAdd(menu.id, qty, options);
+      requireLogin();
+      return;
+    }
+    addToCart(menu.id, qty, options);
     refreshCartCount();
     showToast(`${menu.name} ${qty}개를 담았어요 🛒`);
   });
+
+  refreshPrice();
 
 })();

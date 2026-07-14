@@ -110,6 +110,7 @@ function registerUser({ username, password, name, email }) {
   users.push(user);
   storageSet(USERS_KEY, users);
   storageSet(SESSION_KEY, username);
+  issueWelcomeCoupon(user);
   applyPendingFavorite();
   return { ok: true, user };
 }
@@ -172,6 +173,77 @@ function requireLogin() {
     next
   )}`;
   return false;
+}
+
+/* ── 보유 쿠폰 (계정별 저장) ── */
+
+const COUPONS_KEY = "cafe_coupons";
+
+function getCouponStore() {
+  const stored = storageGet(COUPONS_KEY, {});
+  return stored && typeof stored === "object" && !Array.isArray(stored)
+    ? stored
+    : {};
+}
+
+function issueWelcomeCoupon(targetUser = getCurrentUser()) {
+  if (!targetUser || targetUser.role !== "customer") return [];
+  const store = getCouponStore();
+  const coupons = Array.isArray(store[targetUser.username])
+    ? store[targetUser.username]
+    : [];
+
+  if (!coupons.some((coupon) => coupon.id === "welcome-drink-20")) {
+    coupons.push({
+      id: "welcome-drink-20",
+      name: "신규 가입 웰컴 쿠폰",
+      benefit: "음료 20% 할인",
+      condition: "첫 주문 시 사용 가능",
+      issuedAt: new Date().toISOString(),
+      validDays: 30,
+      used: false,
+    });
+    store[targetUser.username] = coupons;
+    storageSet(COUPONS_KEY, store);
+  }
+  return coupons;
+}
+
+function getCoupons() {
+  const user = getCurrentUser();
+  if (!user || user.role !== "customer") return [];
+  return issueWelcomeCoupon(user);
+}
+
+function isCouponAvailable(coupon) {
+  if (!coupon || coupon.used) return false;
+  if (!coupon.validDays || !coupon.issuedAt) return true;
+  const expiresAt = new Date(coupon.issuedAt).getTime() +
+    Number(coupon.validDays) * 24 * 60 * 60 * 1000;
+  return Number.isFinite(expiresAt) && expiresAt >= Date.now();
+}
+
+function getAvailableCoupons() {
+  return getCoupons().filter(isCouponAvailable);
+}
+
+function markCouponUsed(couponId, orderId) {
+  const user = getCurrentUser();
+  if (!user || !couponId) return false;
+  const store = getCouponStore();
+  const coupons = Array.isArray(store[user.username])
+    ? store[user.username]
+    : [];
+  const coupon = coupons.find(
+    (item) => item.id === couponId && isCouponAvailable(item)
+  );
+  if (!coupon) return false;
+  coupon.used = true;
+  coupon.usedAt = new Date().toISOString();
+  coupon.orderId = orderId;
+  store[user.username] = coupons;
+  storageSet(COUPONS_KEY, store);
+  return true;
 }
 
 /* ── 찜한 메뉴 (계정별 저장) ── */
@@ -255,19 +327,252 @@ function applyPendingFavorite() {
 
 const CART_KEY = "cafe_cart";
 
-/** 장바구니 배열 반환: [{ menuId, qty }] */
+const MENU_OPTION_PRICES = {
+  large: 700,
+  extraShot: 500,
+  syrup: 500,
+};
+
+function isDrinkMenu(menu) {
+  return Boolean(menu && menu.categoryId !== "dessert");
+}
+
+function getMenuTemperatures(menu) {
+  const tags = (menu && menu.tags) || [];
+  if (tags.includes("HOT/ICE")) return ["HOT", "ICE"];
+  if (tags.includes("ICE")) return ["ICE"];
+  if (tags.includes("HOT")) return ["HOT"];
+  return ["HOT", "ICE"];
+}
+
+function normalizeMenuOptions(menu, options = {}) {
+  if (!isDrinkMenu(menu)) return {};
+  const syrupTypes = ["", "바닐라", "카라멜", "헤이즐넛"];
+  const temperatures = getMenuTemperatures(menu);
+  return {
+    temperature: temperatures.includes(options.temperature)
+      ? options.temperature
+      : temperatures[0],
+    size: options.size === "large" ? "large" : "regular",
+    extraShot: Boolean(options.extraShot),
+    syrup: syrupTypes.includes(options.syrup) ? options.syrup : "",
+  };
+}
+
+function getMenuOptionExtra(options = {}) {
+  return (
+    (options.size === "large" ? MENU_OPTION_PRICES.large : 0) +
+    (options.extraShot ? MENU_OPTION_PRICES.extraShot : 0) +
+    (options.syrup ? MENU_OPTION_PRICES.syrup : 0)
+  );
+}
+
+function getCartItemUnitPrice(item) {
+  const menu = getMenuById(item.menuId);
+  return menu ? menu.price + getMenuOptionExtra(item.options) : 0;
+}
+
+function getCartLineId(menuId, options = {}) {
+  return [
+    Number(menuId),
+    options.temperature || "none",
+    options.size || "none",
+    options.extraShot ? "shot" : "no-shot",
+    options.syrup || "no-syrup",
+  ].join("::");
+}
+
+function formatMenuOptions(options = {}) {
+  if (!options.temperature && !options.size && !options.extraShot && !options.syrup) {
+    return "";
+  }
+  const labels = [];
+  if (options.temperature) labels.push(options.temperature);
+  if (options.size) labels.push(options.size === "large" ? "Large" : "Regular");
+  if (options.extraShot) labels.push("샷 추가");
+  if (options.syrup) labels.push(`${options.syrup} 시럽`);
+  return labels.join(" · ");
+}
+
+/**
+ * 모든 장바구니 담기 버튼에서 공통으로 사용하는 옵션 창.
+ * 음료는 온도(선택 가능한 경우), 사이즈, 샷, 시럽을 고르고
+ * 디저트는 추가 옵션이 없음을 안내한 뒤 담는다.
+ */
+function openCartOptionModal(menu, qty = 1) {
+  if (!menu) return Promise.resolve(null);
+
+  const existing = document.querySelector(".cart-option-modal");
+  if (existing) existing.remove();
+
+  const drink = isDrinkMenu(menu);
+  const temperatures = getMenuTemperatures(menu);
+  const fixedTemperature = temperatures.length === 1;
+  const safeQty = Math.max(1, Number(qty) || 1);
+  const modal = document.createElement("div");
+  modal.className = "cart-option-modal";
+  modal.innerHTML = `
+    <div class="cart-option-dialog" role="dialog" aria-modal="true" aria-labelledby="cart-option-title">
+      <div class="cart-option-head">
+        <div>
+          <p class="cart-option-eyebrow">장바구니 옵션</p>
+          <h2 id="cart-option-title">${escapeHTML(menu.name)}</h2>
+        </div>
+        <button class="cart-option-close" type="button" aria-label="옵션 창 닫기">×</button>
+      </div>
+
+      ${
+        drink
+          ? `
+            <div class="cart-option-fields">
+              <fieldset class="cart-option-group">
+                <legend>온도</legend>
+                ${
+                  fixedTemperature
+                    ? `<p class="cart-option-fixed"><strong>${temperatures[0]}</strong> 전용 메뉴예요.</p>`
+                    : `<div class="cart-option-buttons">
+                        ${temperatures
+                          .map(
+                            (temperature, index) => `
+                              <label class="cart-option-chip">
+                                <input type="radio" name="modal-temperature" value="${temperature}" ${
+                                  index === 0 ? "checked" : ""
+                                } />
+                                <span>${temperature}</span>
+                              </label>`
+                          )
+                          .join("")}
+                      </div>`
+                }
+              </fieldset>
+
+              <fieldset class="cart-option-group">
+                <legend>사이즈</legend>
+                <div class="cart-option-buttons">
+                  <label class="cart-option-chip">
+                    <input type="radio" name="modal-size" value="regular" checked />
+                    <span>Regular</span>
+                  </label>
+                  <label class="cart-option-chip">
+                    <input type="radio" name="modal-size" value="large" />
+                    <span>Large +700원</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="cart-option-group">
+                <legend>샷·시럽 추가</legend>
+                <label class="cart-option-check">
+                  <input type="checkbox" data-option="extra-shot" />
+                  <span>샷 추가 +500원</span>
+                </label>
+                <label class="cart-option-select-label" for="modal-syrup">시럽</label>
+                <select class="cart-option-select" id="modal-syrup">
+                  <option value="">추가 안 함</option>
+                  <option value="바닐라">바닐라 +500원</option>
+                  <option value="카라멜">카라멜 +500원</option>
+                  <option value="헤이즐넛">헤이즐넛 +500원</option>
+                </select>
+              </fieldset>
+            </div>`
+          : `<p class="cart-option-empty">디저트 메뉴는 추가 옵션 없이 장바구니에 담겨요.</p>`
+      }
+
+      <div class="cart-option-foot">
+        <p><span>${safeQty}개 합계</span><strong data-option-total>${formatPrice(
+          menu.price * safeQty
+        )}</strong></p>
+        <div class="cart-option-actions">
+          <button class="cart-option-cancel" type="button">취소</button>
+          <button class="cart-option-confirm" type="button">선택 완료</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  document.body.classList.add("is-option-modal-open");
+
+  return new Promise((resolve) => {
+    const optionValues = () => {
+      if (!drink) return {};
+      return normalizeMenuOptions(menu, {
+        temperature: fixedTemperature
+          ? temperatures[0]
+          : modal.querySelector('input[name="modal-temperature"]:checked')
+              ?.value,
+        size:
+          modal.querySelector('input[name="modal-size"]:checked')?.value ||
+          "regular",
+        extraShot: Boolean(
+          modal.querySelector('[data-option="extra-shot"]')?.checked
+        ),
+        syrup: modal.querySelector("#modal-syrup")?.value || "",
+      });
+    };
+
+    const refreshTotal = () => {
+      const total = (menu.price + getMenuOptionExtra(optionValues())) * safeQty;
+      modal.querySelector("[data-option-total]").textContent = formatPrice(total);
+    };
+
+    const finish = (options) => {
+      document.removeEventListener("keydown", onKeydown);
+      document.body.classList.remove("is-option-modal-open");
+      modal.remove();
+      resolve(options);
+    };
+
+    const onKeydown = (event) => {
+      if (event.key === "Escape") finish(null);
+    };
+
+    modal.addEventListener("change", refreshTotal);
+    modal.querySelector(".cart-option-confirm").addEventListener("click", () => {
+      finish(optionValues());
+    });
+    modal.querySelector(".cart-option-cancel").addEventListener("click", () => {
+      finish(null);
+    });
+    modal.querySelector(".cart-option-close").addEventListener("click", () => {
+      finish(null);
+    });
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) finish(null);
+    });
+    document.addEventListener("keydown", onKeydown);
+    modal.querySelector(".cart-option-close").focus();
+  });
+}
+
+/** 장바구니 배열 반환: [{ lineId, menuId, qty, options }] */
 function getCart() {
-  return storageGet(CART_KEY, []);
+  const stored = storageGet(CART_KEY, []);
+  if (!Array.isArray(stored)) return [];
+  return stored.map((item) => {
+    const menu = getMenuById(item.menuId);
+    const options = normalizeMenuOptions(menu, item.options || {});
+    return {
+      ...item,
+      menuId: Number(item.menuId),
+      qty: Math.max(1, Number(item.qty) || 1),
+      options,
+      lineId: item.lineId || getCartLineId(item.menuId, options),
+    };
+  });
 }
 
 /** 장바구니에 담기 (이미 있으면 수량 증가) */
-function addToCart(menuId, qty = 1) {
+function addToCart(menuId, qty = 1, selectedOptions = {}) {
   const cart = getCart();
-  const found = cart.find((item) => item.menuId === menuId);
+  const menu = getMenuById(menuId);
+  if (!menu) return cart;
+  const options = normalizeMenuOptions(menu, selectedOptions);
+  const lineId = getCartLineId(menuId, options);
+  const found = cart.find((item) => item.lineId === lineId);
   if (found) {
     found.qty += qty;
   } else {
-    cart.push({ menuId, qty });
+    cart.push({ lineId, menuId: Number(menuId), qty, options });
   }
   storageSet(CART_KEY, cart);
   refreshCartBadges();
@@ -275,12 +580,12 @@ function addToCart(menuId, qty = 1) {
 }
 
 /** 장바구니 항목 수량 변경 (0 이하이면 제거) */
-function updateCartQty(menuId, qty) {
+function updateCartQty(lineId, qty) {
   let cart = getCart();
   if (qty <= 0) {
-    cart = cart.filter((item) => item.menuId !== menuId);
+    cart = cart.filter((item) => item.lineId !== String(lineId));
   } else {
-    const found = cart.find((item) => item.menuId === menuId);
+    const found = cart.find((item) => item.lineId === String(lineId));
     if (found) found.qty = qty;
   }
   storageSet(CART_KEY, cart);
@@ -289,8 +594,8 @@ function updateCartQty(menuId, qty) {
 }
 
 /** 장바구니 항목 제거 */
-function removeFromCart(menuId) {
-  const cart = getCart().filter((item) => item.menuId !== menuId);
+function removeFromCart(lineId) {
+  const cart = getCart().filter((item) => item.lineId !== String(lineId));
   storageSet(CART_KEY, cart);
   refreshCartBadges();
   return cart;
@@ -306,8 +611,8 @@ function clearCart() {
 const PENDING_ADD_KEY = "cafe_pending_add";
 
 /** 로그인 전에 담으려던 메뉴를 보관 */
-function setPendingCartAdd(menuId, qty = 1) {
-  storageSet(PENDING_ADD_KEY, { menuId, qty });
+function setPendingCartAdd(menuId, qty = 1, options = {}) {
+  storageSet(PENDING_ADD_KEY, { menuId, qty, options });
 }
 
 /** 로그인되어 있고 대기 중인 담기가 있으면 장바구니에 담고 비움 */
@@ -319,7 +624,7 @@ function applyPendingCartAdd() {
   } catch {
     /* 저장소 접근 실패 무시 */
   }
-  addToCart(pending.menuId, pending.qty || 1);
+  addToCart(pending.menuId, pending.qty || 1, pending.options || {});
   showToast("장바구니에 담았어요 🛒");
 }
 
@@ -340,9 +645,35 @@ function refreshCartBadges() {
 /** 장바구니 총 금액 */
 function getCartTotal() {
   return getCart().reduce((sum, item) => {
-    const menu = getMenuById(item.menuId);
-    return menu ? sum + menu.price * item.qty : sum;
+    return sum + getCartItemUnitPrice(item) * item.qty;
   }, 0);
+}
+
+/** 쿠폰을 포함한 장바구니 결제 금액 계산 */
+function getCartPricing(couponId = "") {
+  const cart = getCart();
+  const subtotal = getCartTotal();
+  const coupon = couponId
+    ? getAvailableCoupons().find((item) => item.id === couponId) || null
+    : null;
+  let discount = 0;
+
+  if (coupon && coupon.id === "welcome-drink-20") {
+    const drinkSubtotal = cart.reduce((sum, item) => {
+      const menu = getMenuById(item.menuId);
+      return isDrinkMenu(menu)
+        ? sum + getCartItemUnitPrice(item) * item.qty
+        : sum;
+    }, 0);
+    discount = Math.floor(drinkSubtotal * 0.2);
+  }
+
+  return {
+    subtotal,
+    discount,
+    total: Math.max(0, subtotal - discount),
+    coupon: discount > 0 ? coupon : null,
+  };
 }
 
 /* ── 주문 (Order) ── */
@@ -381,7 +712,7 @@ function generateOrderId(orders) {
  * 현재 장바구니로 주문 생성 후 장바구니 비우기.
  * 반환: 생성된 주문 객체 (장바구니가 비었으면 null)
  */
-function createOrderFromCart() {
+function createOrderFromCart(orderOptions = {}) {
   const cart = getCart();
   if (cart.length === 0) return null;
 
@@ -389,22 +720,43 @@ function createOrderFromCart() {
     .map((c) => {
       const menu = getMenuById(c.menuId);
       if (!menu) return null;
-      return { menuId: menu.id, name: menu.name, price: menu.price, qty: c.qty };
+      const unitPrice = menu.price + getMenuOptionExtra(c.options);
+      return {
+        menuId: menu.id,
+        name: menu.name,
+        basePrice: menu.price,
+        price: unitPrice,
+        qty: c.qty,
+        options: c.options || {},
+      };
     })
     .filter(Boolean);
   if (items.length === 0) return null;
 
   const orders = getOrders();
+  const pricing = getCartPricing(orderOptions.couponId || "");
   const order = {
     id: generateOrderId(orders),
     createdAt: new Date().toISOString(),
     status: "pending",
+    fulfillment: orderOptions.fulfillment === "dine-in" ? "dine-in" : "takeout",
+    request: String(orderOptions.request || "").trim().slice(0, 200),
     items,
-    total: items.reduce((sum, it) => sum + it.price * it.qty, 0),
+    subtotal: pricing.subtotal,
+    discount: pricing.discount,
+    coupon: pricing.coupon
+      ? {
+          id: pricing.coupon.id,
+          name: pricing.coupon.name,
+          benefit: pricing.coupon.benefit,
+        }
+      : null,
+    total: pricing.total,
   };
 
   orders.unshift(order);
   storageSet(ORDERS_KEY, orders);
+  if (order.coupon) markCouponUsed(order.coupon.id, order.id);
   clearCart();
   return order;
 }
@@ -677,6 +1029,9 @@ window.CAFE_UTILS = {
   registerUser,
   initAuthUI,
   requireLogin,
+  getCoupons,
+  getAvailableCoupons,
+  issueWelcomeCoupon,
   getFavorites,
   isFavorite,
   addFavorite,
@@ -689,8 +1044,16 @@ window.CAFE_UTILS = {
   updateCartQty,
   removeFromCart,
   clearCart,
+  isDrinkMenu,
+  getMenuTemperatures,
+  normalizeMenuOptions,
+  getMenuOptionExtra,
+  getCartItemUnitPrice,
+  formatMenuOptions,
+  openCartOptionModal,
   getCartCount,
   getCartTotal,
+  getCartPricing,
   refreshCartBadges,
   setPendingCartAdd,
   applyPendingCartAdd,

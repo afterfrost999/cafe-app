@@ -8,9 +8,13 @@
     getAllMenus,
     formatPrice,
     addToCart,
+    openCartOptionModal,
     getCurrentUser,
     requireLogin,
     setPendingCartAdd,
+    isFavorite,
+    toggleFavorite,
+    setPendingFavorite,
     showToast,
   } = window.CAFE_UTILS;
 
@@ -140,10 +144,18 @@
     // 뒤에 숨겨진 추천 메뉴 카드
     const reveal = document.createElement("div");
     reveal.className = "pick-reveal";
+    const favorite = isFavorite(menu.id);
     reveal.innerHTML = `
       <div class="reveal-thumb">
         <img src="${CAFE_PIXEL.menuArt(menu)}" alt="${menu.name}" />
       </div>
+      <button
+        type="button"
+        class="reveal-favorite ${favorite ? "is-favorite" : ""}"
+        aria-pressed="${favorite}"
+        aria-label="${menu.name} ${favorite ? "찜 해제" : "찜하기"}"
+        title="${favorite ? "찜 해제" : "찜하기"}"
+      ><span aria-hidden="true">${favorite ? "♥" : "♡"}</span></button>
       <div class="reveal-body">
         <p class="reveal-name">${menu.name}</p>
         <p class="reveal-price">${formatPrice(menu.price)}</p>
@@ -151,15 +163,38 @@
       </div>`;
 
     // 공개된 메뉴를 장바구니에 담기
-    reveal.querySelector(".reveal-add").addEventListener("click", () => {
+    reveal.querySelector(".reveal-add").addEventListener("click", async () => {
+      const options = await openCartOptionModal(menu, 1);
+      if (options === null) return;
       // 비로그인: 담으려던 메뉴를 저장해두고 로그인 후 자동으로 담기
       if (!getCurrentUser()) {
-        setPendingCartAdd(menu.id, 1);
+        setPendingCartAdd(menu.id, 1, options);
         requireLogin();
         return;
       }
-      addToCart(menu.id, 1);
+      addToCart(menu.id, 1, options);
       showToast(`${menu.name} 담았어요 🛒`);
+    });
+
+    // 공개된 추천 메뉴 찜하기
+    const favoriteButton = reveal.querySelector(".reveal-favorite");
+    favoriteButton.addEventListener("click", () => {
+      if (!getCurrentUser()) {
+        setPendingFavorite(menu.id);
+        requireLogin();
+        return;
+      }
+
+      const nextFavorite = toggleFavorite(menu.id);
+      favoriteButton.classList.toggle("is-favorite", nextFavorite);
+      favoriteButton.setAttribute("aria-pressed", String(nextFavorite));
+      favoriteButton.setAttribute(
+        "aria-label",
+        `${menu.name} ${nextFavorite ? "찜 해제" : "찜하기"}`
+      );
+      favoriteButton.title = nextFavorite ? "찜 해제" : "찜하기";
+      favoriteButton.querySelector("span").textContent = nextFavorite ? "♥" : "♡";
+      showToast(nextFavorite ? "찜한 메뉴에 담았어요 ♥" : "찜을 해제했어요");
     });
 
     // 위에 덮인 카드 (캔버스)

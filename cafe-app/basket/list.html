@@ -10,7 +10,7 @@
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="../index.html" class="logo">Chimchar Cafe 🔥</a>
+        <a href="../index.html" class="logo">Chimchar Cafe <span class="pixel-flame" aria-hidden="true"></span></a>
         <nav class="nav" data-auth-nav></nav>
       </div>
     </header>
@@ -38,11 +38,47 @@
             <dt>총 상품금액</dt>
             <dd id="summary-total">0원</dd>
           </dl>
+          <div class="coupon-picker">
+            <label for="coupon-select">보유 중인 쿠폰</label>
+            <select id="coupon-select">
+              <option value="">쿠폰 적용 안 함</option>
+            </select>
+            <p id="coupon-help">쿠폰을 선택하면 할인 금액이 반영돼요.</p>
+          </div>
+          <dl class="summary-row summary-discount">
+            <dt>쿠폰 할인</dt>
+            <dd id="summary-discount">-0원</dd>
+          </dl>
           <div class="summary-divider"></div>
           <dl class="summary-row summary-final">
             <dt>결제 예정금액</dt>
             <dd id="summary-final">0원</dd>
           </dl>
+          <div class="checkout-options">
+            <fieldset class="fulfillment-options">
+              <legend>이용 방법</legend>
+              <div class="fulfillment-chips">
+                <label class="fulfillment-chip">
+                  <input type="radio" name="fulfillment" value="takeout" checked />
+                  <span>포장</span>
+                </label>
+                <label class="fulfillment-chip">
+                  <input type="radio" name="fulfillment" value="dine-in" />
+                  <span>매장</span>
+                </label>
+              </div>
+            </fieldset>
+            <label class="request-field" for="order-request">
+              <span>요청사항</span>
+              <textarea
+                id="order-request"
+                maxlength="200"
+                rows="3"
+                placeholder="예: 빨대는 빼주세요"
+              ></textarea>
+              <small><span id="request-count">0</span>/200</small>
+            </label>
+          </div>
           <button class="btn btn-primary summary-order" id="btn-order">
             주문하기
           </button>

@@ -179,6 +179,90 @@
   color: var(--color-primary);
 }
 
+/* 보유 쿠폰 */
+.coupon-count {
+  color: var(--color-accent-light);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.coupon-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.coupon-card {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+}
+
+.coupon-benefit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+  padding: var(--space-lg);
+}
+
+.coupon-pixel {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border: 3px solid #6f1d2c;
+  background: #8a2f12;
+  color: #ffe5a5;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  box-shadow: 4px 4px 0 rgba(58, 36, 16, 0.5);
+}
+
+.coupon-name {
+  color: #4a2b14;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+
+.coupon-value {
+  margin-top: 3px;
+  color: #8a2f12;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+}
+
+.coupon-meta {
+  display: flex;
+  flex: 0 0 190px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: var(--space-md) var(--space-lg);
+  border-left: 2px dashed rgba(90, 55, 22, 0.38);
+  color: #6b4a26;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.coupon-status {
+  align-self: flex-start;
+  margin-bottom: 3px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: #216e39;
+  color: #fff;
+  font-weight: 800;
+}
+
 /* 최근 주문 (양피지 카드) */
 .recent-list {
   display: flex;
@@ -285,7 +369,8 @@
 /* 위·아래 나무봉 (관리 대시보드 카드와 동일) */
 .profile,
 .stat-tile,
-.recent-card {
+.recent-card,
+.coupon-card {
   position: relative;
   margin-block: 8px;
   overflow: visible;
@@ -296,7 +381,9 @@
 .stat-tile::before,
 .stat-tile::after,
 .recent-card::before,
-.recent-card::after {
+.recent-card::after,
+.coupon-card::before,
+.coupon-card::after {
   content: "";
   position: absolute;
   left: -7px;
@@ -313,13 +400,15 @@
 
 .profile::before,
 .stat-tile::before,
-.recent-card::before {
+.recent-card::before,
+.coupon-card::before {
   top: -8px;
 }
 
 .profile::after,
 .stat-tile::after,
-.recent-card::after {
+.recent-card::after,
+.coupon-card::after {
   bottom: -8px;
 }
 
@@ -329,5 +418,15 @@
   }
   .profile-name {
     font-size: var(--font-size-lg);
+  }
+
+  .coupon-card {
+    flex-direction: column;
+  }
+
+  .coupon-meta {
+    flex-basis: auto;
+    border-top: 2px dashed rgba(90, 55, 22, 0.38);
+    border-left: 0;
   }
 }
