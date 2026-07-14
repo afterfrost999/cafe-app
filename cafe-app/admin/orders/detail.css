@@ -165,6 +165,31 @@
   font-size: var(--font-size-sm);
 }
 
+.item-options {
+  margin: 3px 0;
+  color: #5a2d12;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.order-preferences {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  color: #3a2410;
+}
+
+.order-preferences dl {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: var(--space-md);
+}
+
+.order-preferences dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .item-subtotal {
   min-width: 80px;
   color: #8a2f12;
@@ -186,6 +211,11 @@
 
 .pay-row dd {
   color: #5a2d12;
+}
+
+.pay-discount dt,
+.pay-discount dd {
+  color: #1f6b35;
 }
 
 .pay-divider {
@@ -218,6 +248,7 @@
 
 /* 대시보드와 같은 양피지 카드 + 위·아래 나무봉 */
 .order-head,
+.order-preferences,
 .status-control,
 .item-list,
 .pay-box,
@@ -234,6 +265,8 @@
 
 .order-head::before,
 .order-head::after,
+.order-preferences::before,
+.order-preferences::after,
 .status-control::before,
 .status-control::after,
 .item-list::before,
@@ -257,6 +290,7 @@
 }
 
 .order-head::before,
+.order-preferences::before,
 .status-control::before,
 .item-list::before,
 .pay-box::before,
@@ -265,6 +299,7 @@
 }
 
 .order-head::after,
+.order-preferences::after,
 .status-control::after,
 .item-list::after,
 .pay-box::after,
@@ -279,6 +314,18 @@
 }
 
 @media (max-width: 480px) {
+  .order-head,
+  .order-preferences,
+  .status-control,
+  .pay-box {
+    padding: var(--space-md);
+  }
+
+  .order-preferences dl {
+    grid-template-columns: 74px 1fr;
+    gap: var(--space-sm);
+  }
+
   .order-item {
     grid-template-columns: 1fr auto;
   }

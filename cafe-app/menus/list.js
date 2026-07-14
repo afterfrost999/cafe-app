@@ -7,11 +7,14 @@
   const {
     formatPrice,
     getMenusByCategory,
+    getMenuById,
     addToCart,
+    openCartOptionModal,
     getCartCount,
     getQueryParam,
     getCurrentUser,
     requireLogin,
+    setPendingCartAdd,
     isFavorite,
     toggleFavorite,
     setPendingFavorite,
@@ -88,10 +91,16 @@
           ? `<div class="soldout-overlay">품절</div>`
           : "";
         const favorite = isFavorite(m.id);
+        const detailHref = m.soldOut ? "#" : `detail.html?id=${m.id}`;
         return `
           <li class="floaty">
             <div class="menu-card">
-              <a href="detail.html?id=${m.id}">
+              <a
+                class="menu-detail-link ${m.soldOut ? "is-sold-out" : ""}"
+                href="${detailHref}"
+                data-sold-out="${m.soldOut}"
+                ${m.soldOut ? 'aria-disabled="true"' : ""}
+              >
                 <div class="menu-thumb">
                   <img src="${window.CAFE_PIXEL ? CAFE_PIXEL.menuArt(m) : m.image}" alt="${m.name}" loading="lazy" />
                   <div class="menu-tags">${tags}</div>
@@ -123,13 +132,30 @@
       })
       .join("");
 
+    // 품절 메뉴는 상세 페이지로 이동하지 않고 현재 화면에서 안내
+    gridEl
+      .querySelectorAll('.menu-detail-link[data-sold-out="true"]')
+      .forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          showToast("해당 메뉴는 품절됐어요.");
+        });
+      });
+
     // 담기 버튼 (a 태그 이동과 분리되어 있음)
     gridEl.querySelectorAll(".add-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        if (!requireLogin()) return;
         const id = Number(btn.dataset.id);
-        addToCart(id, 1);
+        const menu = getMenuById(id);
+        const options = await openCartOptionModal(menu, 1);
+        if (options === null) return;
+        if (!getCurrentUser()) {
+          setPendingCartAdd(id, 1, options);
+          requireLogin();
+          return;
+        }
+        addToCart(id, 1, options);
         refreshCartCount();
         showToast("장바구니에 담았어요 🛒");
       });

@@ -68,6 +68,7 @@
           <td class="order-id">${o.id}</td>
           <td>${formatDate(o.createdAt)}</td>
           <td class="order-menu">${itemsLabel(o.items)}</td>
+          <td class="ta-center">${o.fulfillment === "dine-in" ? "매장" : "포장"}</td>
           <td class="ta-right order-amount">${formatPrice(o.total)}</td>
           <td class="ta-center">
             <span class="status-badge" style="background:${status.color}">

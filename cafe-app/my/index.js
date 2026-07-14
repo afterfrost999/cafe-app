@@ -9,6 +9,7 @@
     formatDate,
     getOrders,
     getCurrentUser,
+    getAvailableCoupons,
     getCartCount,
     qs,
   } = window.CAFE_UTILS;
@@ -51,6 +52,45 @@
   qs("#stat-count").textContent = `${totalCount}건`;
   qs("#stat-total").textContent = formatPrice(totalSpent);
   qs("#stat-progress").textContent = `${inProgress}건`;
+
+  /* ── 보유 쿠폰 ── */
+  const coupons = getAvailableCoupons();
+  const couponListEl = qs("#coupon-list");
+  const couponEmptyEl = qs("#coupon-empty");
+  const couponCountEl = qs("#coupon-count");
+
+  couponCountEl.textContent = `${coupons.length}장`;
+  couponEmptyEl.hidden = coupons.length > 0;
+  couponListEl.hidden = coupons.length === 0;
+
+  function couponExpiry(coupon) {
+    const issuedAt = new Date(coupon.issuedAt);
+    issuedAt.setDate(issuedAt.getDate() + Number(coupon.validDays || 30));
+    const pad = (value) => String(value).padStart(2, "0");
+    return `${issuedAt.getFullYear()}.${pad(issuedAt.getMonth() + 1)}.${pad(
+      issuedAt.getDate()
+    )}까지`;
+  }
+
+  couponListEl.innerHTML = coupons
+    .map(
+      (coupon) => `
+        <li class="coupon-card">
+          <div class="coupon-benefit">
+            <span class="coupon-pixel" aria-hidden="true">%</span>
+            <div>
+              <p class="coupon-name">${coupon.name}</p>
+              <p class="coupon-value">${coupon.benefit}</p>
+            </div>
+          </div>
+          <div class="coupon-meta">
+            <span class="coupon-status">사용 가능</span>
+            <span>${coupon.condition}</span>
+            <span>${couponExpiry(coupon)}</span>
+          </div>
+        </li>`
+    )
+    .join("");
 
   /* ── 최근 주문 (최대 3건) ── */
   const listEl = qs("#recent-list");

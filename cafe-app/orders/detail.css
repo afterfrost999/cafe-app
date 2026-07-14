@@ -123,11 +123,12 @@
 
 /* 주문 항목 */
 .section-title {
-  font-size: var(--font-size-base);
+  margin-top: 6px;
+  margin-bottom: var(--space-sm);
+  font-size: 0.86rem;
   font-weight: 800;
   color: var(--color-primary-dark);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
-  margin-bottom: var(--space-sm);
 }
 
 .item-list {
@@ -162,6 +163,43 @@
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: #111;
+}
+
+.item-options {
+  margin: 3px 0;
+  color: #5a2d12;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.order-preferences {
+  display: grid;
+  gap: var(--space-sm);
+  margin-block: 8px calc(var(--space-lg) + 8px);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--scroll-gold-border);
+  border-radius: 3px;
+  background: var(--scroll-gold-bg);
+  background-size: auto, 84px 84px;
+  color: #3a2410;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42);
+}
+
+.order-preferences dl {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: var(--space-md);
+}
+
+.order-preferences dt,
+.order-preferences dd {
+  font-weight: 800;
+}
+
+.order-preferences dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .item-qty {
@@ -200,6 +238,11 @@
 .pay-row dd {
   font-weight: 800;
   color: #3a2410;
+}
+
+.pay-discount dt,
+.pay-discount dd {
+  color: #1f6b35;
 }
 
 .pay-divider {
@@ -241,6 +284,7 @@
 
 /* 위·아래 나무봉 (대시보드 카드와 동일) */
 .order-head,
+.order-preferences,
 .item-list,
 .pay-box,
 .not-found {
@@ -250,6 +294,8 @@
 
 .order-head::before,
 .order-head::after,
+.order-preferences::before,
+.order-preferences::after,
 .item-list::before,
 .item-list::after,
 .pay-box::before,
@@ -271,6 +317,7 @@
 }
 
 .order-head::before,
+.order-preferences::before,
 .item-list::before,
 .pay-box::before,
 .not-found::before {
@@ -278,6 +325,7 @@
 }
 
 .order-head::after,
+.order-preferences::after,
 .item-list::after,
 .pay-box::after,
 .not-found::after {
@@ -285,6 +333,19 @@
 }
 
 @media (max-width: 480px) {
+  .order-head {
+    padding: var(--space-md);
+  }
+
+  .order-preferences {
+    padding-inline: var(--space-md);
+  }
+
+  .order-preferences dl {
+    grid-template-columns: 74px 1fr;
+    gap: var(--space-sm);
+  }
+
   .order-item {
     grid-template-columns: 1fr auto;
   }

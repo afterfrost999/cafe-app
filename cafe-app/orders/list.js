@@ -50,6 +50,7 @@
         label: o.status,
         color: "var(--color-text-muted)",
       };
+      const fulfillmentLabel = o.fulfillment === "dine-in" ? "매장" : "포장";
       return `
         <li>
           <a class="order-card" href="detail.html?id=${o.id}">
@@ -59,7 +60,7 @@
                 ${status.label}
               </span>
             </div>
-            <p class="order-date">${formatDate(o.createdAt)}</p>
+            <p class="order-date">${formatDate(o.createdAt)} · ${fulfillmentLabel}</p>
             <div class="order-summary">
               <span class="order-items">${itemsLabel(o.items)}</span>
               <span class="order-total">${formatPrice(o.total)}</span>
