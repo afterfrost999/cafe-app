@@ -7,7 +7,7 @@
   const {
     formatPrice,
     formatDate,
-    getOrders,
+    getMyOrders,
     getCurrentUser,
     getAvailableCoupons,
     getCartCount,
@@ -36,7 +36,7 @@
   const cartCountEl = qs("#cart-count");
   if (cartCountEl) cartCountEl.textContent = getCartCount();
 
-  const orders = getOrders()
+  const orders = getMyOrders()
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 

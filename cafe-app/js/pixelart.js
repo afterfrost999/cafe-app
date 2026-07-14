@@ -588,5 +588,40 @@
     return c;
   }
 
-  window.CAFE_PIXEL = { buildFloor, applyFloor, paperTexture, menuArt, categoryArt, eventArt, cardBack, cardBackCanvas };
+  /* ── 찜 하트 (빈 하트 / 꽉 찬 하트, 투명 배경) ── */
+  function drawHeart(g, W, H, filled) {
+    // 하트 실루엣 (행별 채움 구간)
+    const rows = [
+      [[2, 4], [8, 10]],
+      [[1, 5], [7, 11]],
+      [[1, 11]],
+      [[1, 11]],
+      [[1, 11]],
+      [[2, 10]],
+      [[3, 9]],
+      [[4, 8]],
+      [[5, 7]],
+      [[6, 6]],
+    ];
+    const on = (x, y) =>
+      y >= 0 && y < rows.length && rows[y].some(([a, b]) => x >= a && x <= b);
+    const OUT = "#6f1d2c"; // 외곽선
+    const FILL = "#e5484d"; // 꽉 찬 하트 속색
+    for (let y = 0; y < rows.length; y++) {
+      for (let x = 0; x < W; x++) {
+        if (!on(x, y)) continue;
+        const edge =
+          !on(x - 1, y) || !on(x + 1, y) || !on(x, y - 1) || !on(x, y + 1);
+        if (edge) R(g, x, y, 1, 1, OUT);
+        else if (filled) R(g, x, y, 1, 1, FILL);
+        // 빈 하트는 내부를 비워 투명(윤곽만)
+      }
+    }
+  }
+
+  function heartArt(filled) {
+    return small((g, W, H) => drawHeart(g, W, H, filled), 13, 10, 0);
+  }
+
+  window.CAFE_PIXEL = { buildFloor, applyFloor, paperTexture, menuArt, categoryArt, eventArt, cardBack, cardBackCanvas, heartArt };
 })();

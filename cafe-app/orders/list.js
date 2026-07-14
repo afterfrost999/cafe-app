@@ -7,7 +7,7 @@
   const {
     formatPrice,
     formatDate,
-    getOrders,
+    getMyOrders,
     getCartCount,
     qs,
   } = window.CAFE_UTILS;
@@ -37,7 +37,7 @@
   }
 
   /* 최신순 정렬 후 렌더 */
-  const orders = getOrders()
+  const orders = getMyOrders()
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 

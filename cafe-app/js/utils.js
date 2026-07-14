@@ -39,6 +39,126 @@ function storageSet(key, value) {
   }
 }
 
+/* ── Supabase 연동 ──────────────────────────────
+   전략: localStorage 를 동기 읽기 캐시로 유지하고,
+   - 쓰기: 캐시 즉시 갱신 + Supabase 로 백그라운드 반영 (fire-and-forget)
+   - 읽기: 페이지 로드 시 bootstrapFromSupabase() 가 DB → 캐시로 최신화
+   이렇게 하면 기존 페이지 렌더 코드를 바꾸지 않고도 데이터가 DB 와 연결된다. */
+
+function db() {
+  return window.CAFE_DB || null;
+}
+
+/** Supabase 뮤테이션을 백그라운드로 실행하고 실패 시 로깅 (호출부는 기다리지 않아도 됨) */
+function dbSync(label, run) {
+  const client = db();
+  if (!client) return Promise.resolve(null);
+  return Promise.resolve()
+    .then(() => run(client))
+    .then((res) => {
+      if (res && res.error) {
+        console.error(`[cafe] ${label} 실패:`, res.error.message || res.error);
+      }
+      return res;
+    })
+    .catch((err) => {
+      console.error(`[cafe] ${label} 예외:`, err);
+      return null;
+    });
+}
+
+/** DB → localStorage 캐시 최신화. 페이지 로드 시 1회 호출. */
+async function bootstrapFromSupabase() {
+  const client = db();
+  const map = window.CAFE_MAP;
+  if (!client || !map) return false;
+
+  const results = await Promise.allSettled([
+    client.from("menus").select("*").order("id"),
+    client.from("events").select("*").order("id"),
+    client.from("notices").select("*").order("created_at", { ascending: false }),
+    client.from("members").select("*"),
+    client.from("coupons").select("*"),
+    client.from("favorites").select("*"),
+    client.from("orders").select("*").order("created_at", { ascending: false }),
+    client.from("order_items").select("*").order("id"),
+  ]);
+
+  const value = (i) =>
+    results[i].status === "fulfilled" && !results[i].value.error
+      ? results[i].value.data || []
+      : null;
+
+  const menus = value(0);
+  if (menus) {
+    storageSet(MENUS_KEY, menus.map(map.menuFromRow));
+    storageSet(MENUS_VER_KEY, MENUS_VERSION);
+  }
+
+  const events = value(1);
+  if (events) {
+    storageSet(EVENTS_KEY, events.map(map.eventFromRow));
+    storageSet(EVENTS_VER_KEY, EVENTS_VERSION);
+  }
+
+  const notices = value(2);
+  if (notices) {
+    storageSet(NOTICES_KEY, notices.map(map.noticeFromRow));
+    storageSet(NOTICES_VER_KEY, NOTICES_VERSION);
+  }
+
+  const members = value(3);
+  if (members) {
+    // 기본 계정은 유지하되 DB 회원을 병합
+    const merged = ensureDefaultUser();
+    members.map(map.memberFromRow).forEach((m) => {
+      const idx = merged.findIndex((u) => u.username === m.username);
+      if (idx === -1) merged.push(m);
+      else merged[idx] = m;
+    });
+    storageSet(USERS_KEY, merged);
+  }
+
+  const coupons = value(4);
+  if (coupons) {
+    const store = {};
+    coupons.forEach((r) => {
+      (store[r.member_username] = store[r.member_username] || []).push(
+        map.couponFromRow(r)
+      );
+    });
+    storageSet(COUPONS_KEY, store);
+  }
+
+  const favorites = value(5);
+  if (favorites) {
+    const store = {};
+    favorites.forEach((r) => {
+      (store[r.member_username] = store[r.member_username] || []).push(
+        Number(r.menu_id)
+      );
+    });
+    storageSet(FAVORITES_KEY, store);
+  }
+
+  const orders = value(6);
+  const items = value(7);
+  if (orders && items) {
+    const byOrder = {};
+    items.forEach((it) => {
+      (byOrder[it.order_id] = byOrder[it.order_id] || []).push(it);
+    });
+    storageSet(
+      ORDERS_KEY,
+      orders.map((o) => map.orderFromRows(o, byOrder[o.id] || []))
+    );
+  }
+
+  refreshCartBadges();
+  window.dispatchEvent(new CustomEvent("cafe:synced"));
+  return true;
+}
+
 /* ── 데모 회원 / 로그인 ── */
 
 const USERS_KEY = "cafe_users";
@@ -110,6 +230,9 @@ function registerUser({ username, password, name, email }) {
   users.push(user);
   storageSet(USERS_KEY, users);
   storageSet(SESSION_KEY, username);
+  dbSync("회원가입", (c) =>
+    c.from("members").insert({ username, password, name, email, role: "customer" })
+  );
   issueWelcomeCoupon(user);
   applyPendingFavorite();
   return { ok: true, user };
@@ -205,6 +328,20 @@ function issueWelcomeCoupon(targetUser = getCurrentUser()) {
     });
     store[targetUser.username] = coupons;
     storageSet(COUPONS_KEY, store);
+    dbSync("웰컴 쿠폰 발급", (c) =>
+      c.from("coupons").upsert(
+        {
+          member_username: targetUser.username,
+          code: "welcome-drink-20",
+          name: "신규 가입 웰컴 쿠폰",
+          benefit: "음료 20% 할인",
+          condition: "첫 주문 시 사용 가능",
+          valid_days: 30,
+          used: false,
+        },
+        { onConflict: "member_username,code", ignoreDuplicates: true }
+      )
+    );
   }
   return coupons;
 }
@@ -243,6 +380,13 @@ function markCouponUsed(couponId, orderId) {
   coupon.orderId = orderId;
   store[user.username] = coupons;
   storageSet(COUPONS_KEY, store);
+  dbSync("쿠폰 사용 처리", (c) =>
+    c
+      .from("coupons")
+      .update({ used: true, used_at: coupon.usedAt, order_id: orderId })
+      .eq("member_username", user.username)
+      .eq("code", couponId)
+  );
   return true;
 }
 
@@ -280,6 +424,14 @@ function addFavorite(menuId) {
   if (!favorites.includes(id)) favorites.push(id);
   store[user.username] = favorites;
   storageSet(FAVORITES_KEY, store);
+  dbSync("찜 추가", (c) =>
+    c
+      .from("favorites")
+      .upsert(
+        { member_username: user.username, menu_id: id },
+        { onConflict: "member_username,menu_id", ignoreDuplicates: true }
+      )
+  );
   return true;
 }
 
@@ -292,6 +444,13 @@ function removeFavorite(menuId) {
     .map(Number)
     .filter((favoriteId) => favoriteId !== id);
   storageSet(FAVORITES_KEY, store);
+  dbSync("찜 제거", (c) =>
+    c
+      .from("favorites")
+      .delete()
+      .eq("member_username", user.username)
+      .eq("menu_id", id)
+  );
   return true;
 }
 
@@ -692,9 +851,24 @@ function getOrders() {
   return orders;
 }
 
-/** id 로 주문 찾기 */
+/** id 로 주문 찾기 (전체 대상 — 관리자용) */
 function getOrderById(id) {
   return getOrders().find((o) => o.id === id) || null;
+}
+
+/** 현재 로그인 회원의 주문만 (고객 마이페이지/주문내역용) */
+function getMyOrders() {
+  const user = getCurrentUser();
+  if (!user) return [];
+  return getOrders().filter((o) => o.memberUsername === user.username);
+}
+
+/** id 로 주문 찾기 (본인 소유일 때만 반환 — 고객용) */
+function getMyOrderById(id) {
+  const user = getCurrentUser();
+  if (!user) return null;
+  const order = getOrders().find((o) => o.id === id) || null;
+  return order && order.memberUsername === user.username ? order : null;
 }
 
 /** 주문번호 생성: ORD-YYYYMMDD-NNN */
@@ -735,10 +909,12 @@ function createOrderFromCart(orderOptions = {}) {
 
   const orders = getOrders();
   const pricing = getCartPricing(orderOptions.couponId || "");
+  const currentUser = getCurrentUser();
   const order = {
     id: generateOrderId(orders),
     createdAt: new Date().toISOString(),
     status: "pending",
+    memberUsername: currentUser ? currentUser.username : null,
     fulfillment: orderOptions.fulfillment === "dine-in" ? "dine-in" : "takeout",
     request: String(orderOptions.request || "").trim().slice(0, 200),
     items,
@@ -756,6 +932,27 @@ function createOrderFromCart(orderOptions = {}) {
 
   orders.unshift(order);
   storageSet(ORDERS_KEY, orders);
+
+  const map = window.CAFE_MAP;
+  dbSync("주문 저장", async (c) => {
+    const orderRes = await c.from("orders").insert({
+      id: order.id,
+      status: order.status,
+      fulfillment: order.fulfillment,
+      request: order.request || null,
+      subtotal: order.subtotal,
+      discount: order.discount,
+      total: order.total,
+      coupon_code: order.coupon ? order.coupon.id : null,
+      coupon_name: order.coupon ? order.coupon.name : null,
+      member_username: currentUser ? currentUser.username : null,
+    });
+    if (orderRes.error) return orderRes;
+    return c
+      .from("order_items")
+      .insert(order.items.map((it) => map.orderItemToRow(order.id, it)));
+  });
+
   if (order.coupon) markCouponUsed(order.coupon.id, order.id);
   clearCart();
   return order;
@@ -768,6 +965,9 @@ function updateOrderStatus(id, status) {
   if (idx === -1) return null;
   orders[idx] = { ...orders[idx], status };
   storageSet(ORDERS_KEY, orders);
+  dbSync("주문 상태 변경", (c) =>
+    c.from("orders").update({ status }).eq("id", id)
+  );
   return orders[idx];
 }
 
@@ -813,6 +1013,23 @@ function createMenu(data) {
   const menu = { soldOut: false, tags: [], ...data, id: nextId };
   menus.push(menu);
   saveAllMenus(menus);
+  dbSync("메뉴 추가", async (c) => {
+    const res = await c
+      .from("menus")
+      .insert(window.CAFE_MAP.menuToRow(menu))
+      .select("id")
+      .single();
+    // DB 가 부여한 실제 id 로 캐시 정합성 맞추기
+    if (!res.error && res.data) {
+      const cache = getAllMenus();
+      const target = cache.find((m) => m.id === nextId);
+      if (target) {
+        target.id = res.data.id;
+        saveAllMenus(cache);
+      }
+    }
+    return res;
+  });
   return menu;
 }
 
@@ -823,6 +1040,10 @@ function updateMenu(id, changes) {
   if (idx === -1) return null;
   menus[idx] = { ...menus[idx], ...changes, id: menus[idx].id };
   saveAllMenus(menus);
+  const updated = menus[idx];
+  dbSync("메뉴 수정", (c) =>
+    c.from("menus").update(window.CAFE_MAP.menuToRow(updated)).eq("id", updated.id)
+  );
   return menus[idx];
 }
 
@@ -830,6 +1051,7 @@ function updateMenu(id, changes) {
 function deleteMenu(id) {
   const menus = getAllMenus().filter((m) => m.id !== Number(id));
   saveAllMenus(menus);
+  dbSync("메뉴 삭제", (c) => c.from("menus").delete().eq("id", Number(id)));
 }
 
 /** 품절 상태 토글 */
@@ -876,6 +1098,22 @@ function createEvent(data) {
   const event = { kind: "fire", ...data, id: nextId };
   events.push(event);
   saveAllEvents(events);
+  dbSync("이벤트 추가", async (c) => {
+    const res = await c
+      .from("events")
+      .insert(window.CAFE_MAP.eventToRow(event))
+      .select("id")
+      .single();
+    if (!res.error && res.data) {
+      const cache = getAllEvents();
+      const target = cache.find((e) => e.id === nextId);
+      if (target) {
+        target.id = res.data.id;
+        saveAllEvents(cache);
+      }
+    }
+    return res;
+  });
   return event;
 }
 
@@ -886,6 +1124,10 @@ function updateEvent(id, changes) {
   if (idx === -1) return null;
   events[idx] = { ...events[idx], ...changes, id: events[idx].id };
   saveAllEvents(events);
+  const updated = events[idx];
+  dbSync("이벤트 수정", (c) =>
+    c.from("events").update(window.CAFE_MAP.eventToRow(updated)).eq("id", updated.id)
+  );
   return events[idx];
 }
 
@@ -893,6 +1135,7 @@ function updateEvent(id, changes) {
 function deleteEvent(id) {
   const events = getAllEvents().filter((e) => e.id !== Number(id));
   saveAllEvents(events);
+  dbSync("이벤트 삭제", (c) => c.from("events").delete().eq("id", Number(id)));
 }
 
 /* ── 공지사항 (Notice) : localStorage 오버레이하여 관리자 CRUD 반영 ── */
@@ -936,6 +1179,23 @@ function createNotice(data) {
   };
   notices.push(notice);
   saveAllNotices(notices);
+  dbSync("공지 추가", async (c) => {
+    const res = await c
+      .from("notices")
+      .insert(window.CAFE_MAP.noticeToRow(notice))
+      .select("id, created_at")
+      .single();
+    if (!res.error && res.data) {
+      const cache = getAllNotices();
+      const target = cache.find((n) => n.id === nextId);
+      if (target) {
+        target.id = res.data.id;
+        target.createdAt = res.data.created_at;
+        saveAllNotices(cache);
+      }
+    }
+    return res;
+  });
   return notice;
 }
 
@@ -946,6 +1206,10 @@ function updateNotice(id, changes) {
   if (idx === -1) return null;
   notices[idx] = { ...notices[idx], ...changes, id: notices[idx].id };
   saveAllNotices(notices);
+  const updated = notices[idx];
+  dbSync("공지 수정", (c) =>
+    c.from("notices").update(window.CAFE_MAP.noticeToRow(updated)).eq("id", updated.id)
+  );
   return notices[idx];
 }
 
@@ -953,6 +1217,7 @@ function updateNotice(id, changes) {
 function deleteNotice(id) {
   const notices = getAllNotices().filter((n) => n.id !== Number(id));
   saveAllNotices(notices);
+  dbSync("공지 삭제", (c) => c.from("notices").delete().eq("id", Number(id)));
 }
 
 /* ── DOM / 기타 ── */
@@ -1059,6 +1324,8 @@ window.CAFE_UTILS = {
   applyPendingCartAdd,
   getOrders,
   getOrderById,
+  getMyOrders,
+  getMyOrderById,
   createOrderFromCart,
   updateOrderStatus,
   getAllMenus,
@@ -1084,9 +1351,18 @@ window.CAFE_UTILS = {
   qsa,
   initCursorGlow,
   showToast,
+  bootstrapFromSupabase,
 };
 
 initAuthUI();
 applyPendingFavorite();
 applyPendingCartAdd();
 initCursorGlow();
+
+// DB → 캐시 최신화 (백그라운드). 완료되면 로그인 UI/배지 갱신.
+bootstrapFromSupabase().then((ok) => {
+  if (ok) {
+    initAuthUI();
+    refreshCartBadges();
+  }
+});
